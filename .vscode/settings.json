@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+
+{
+   "search.exclude": {
+      "**/kconfiglib": true,
+   },
+   "git.ignoredRepositories": [
+      "kconfiglib",
+   ],
+}
