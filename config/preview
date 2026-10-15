@@ -4,7 +4,7 @@ menu "Preview"
 
 config PREVIEW_BBOX_RGBA
 	string "Bounding box color"
-	default "255 255 0 128"
+	default "255 255 0 139"
 
 config PREVIEW_BBOX_WIDTH
 	int "Bounding box width"
@@ -12,7 +12,7 @@ config PREVIEW_BBOX_WIDTH
 
 config PREVIEW_BORDER_RGBA
 	string "Border color"
-	default "0 255 255 30"
+	default "0 255 255 50"
 
 config PREVIEW_BORDER_WIDTH
 	int "Border width"

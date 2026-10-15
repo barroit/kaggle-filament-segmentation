@@ -3,7 +3,7 @@
 #
 # Copyright 2026 Jiamu Sun <39@barroit.sh>
 #
-# This does only train the model with the first annotation in annotation set.
+# This only emits the first annotator's mark in the annotation set.
 
 from glob import glob
 from os import link, makedirs
