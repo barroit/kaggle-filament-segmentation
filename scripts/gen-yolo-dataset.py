@@ -13,8 +13,9 @@ from yaml import dump
 
 from pycocotools.coco import COCO
 
-dataset = 'dataset'
-output = f"{dataset}/yolo"
+from lib.use_kconfig import *
+
+output = f"{CONFIG_DATASET_PREFIX}/yolo"
 
 paths = {}
 selected = {}
@@ -22,7 +23,7 @@ selected = {}
 days = set()
 verify_days = set()
 
-coco = COCO(f"{dataset}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")
+coco = COCO(f"{CONFIG_DATASET_PREFIX}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")
 rand = Random(39)
 
 makedirs(f"{output}/train/images")
@@ -37,7 +38,7 @@ with open(f"{output}/dataset.yaml", 'w') as file:
 		'names': { 0: 'filament' },
 	}, file, indent=3)
 
-for path in glob(f"{dataset}/train/train_images/*.jpeg"):
+for path in glob(f"{CONFIG_DATASET_PREFIX}/train/train_images/*.jpeg"):
 	name = basename(path)
 	stem = splitext(name)[0]
 	paths[stem] = path
