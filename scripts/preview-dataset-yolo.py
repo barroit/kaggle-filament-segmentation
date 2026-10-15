@@ -12,7 +12,7 @@ from cv2 import IMREAD_COLOR, addWeighted as add_weighted, \
 		fillPoly as fill_poly, imread, imwrite, polylines
 from numpy import array, float64, int32, rint
 
-from lib.use_kconfig import *
+from lib.kconfig import *
 
 input = f"{CONFIG_DATASET_PREFIX}/yolo"
 output = f"{CONFIG_DATASET_PREFIX}/preview/yolo"

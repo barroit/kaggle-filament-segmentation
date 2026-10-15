@@ -10,7 +10,7 @@ from os import makedirs
 from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
 
-from lib.use_kconfig import *
+from lib.kconfig import *
 
 output = f"{CONFIG_DATASET_PREFIX}/preview/train"
 coco = COCO(f"{CONFIG_DATASET_PREFIX}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")

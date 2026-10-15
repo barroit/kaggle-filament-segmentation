@@ -13,7 +13,7 @@ from yaml import dump
 
 from pycocotools.coco import COCO
 
-from lib.use_kconfig import *
+from lib.kconfig import *
 
 output = f"{CONFIG_DATASET_PREFIX}/yolo"
 
