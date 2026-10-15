@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+menu "Preview"
+
+config PREVIEW_BBOX_RGBA
+	string "Bounding box color"
+	default "255 255 0 128"
+
+config PREVIEW_BBOX_WIDTH
+	int "Bounding box width"
+	default 1
+
+config PREVIEW_BORDER_RGBA
+	string "Border color"
+	default "0 255 255 30"
+
+config PREVIEW_BORDER_WIDTH
+	int "Border width"
+	default 1
+
+config PREVIEW_SPINE_RGBA
+	string "Spine color"
+	default "255 0 0 30"
+
+config PREVIEW_SPINE_WIDTH
+	int "Spine width"
+	default 1
+
+endmenu # Preview

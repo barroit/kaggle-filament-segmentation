@@ -5,3 +5,4 @@ mainmenu "$(first-line,README) Configuration"
 $(warn-off)
 
 source "config/environment"
+source "config/preview"

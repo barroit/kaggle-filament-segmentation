@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "Environment Defaults"
+menu "Environment"
 
 config DATASET_PREFIX
 	string "Dataset directory path"
 	default "dataset"
 
-endmenu # Environment Defaults
+endmenu # Environment

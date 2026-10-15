@@ -3,7 +3,7 @@
 # Copyright 2026 Jiamu Sun <39@barroit.sh>
 #
 
-from kconfiglib.kconfiglib import Kconfig, BOOL, INT, HEX
+from kconfiglib.kconfiglib import Kconfig, BOOL, INT, HEX, STRING
 
 __all__ = []
 __globals__ = globals()
@@ -26,6 +26,8 @@ for symbol in kconfig.unique_defined_syms:
 		val = int(val)
 	elif symbol.type == HEX:
 		val = int(val, 16)
+	elif symbol.type == STRING and symbol.name.endswith('_RGBA'):
+		val = tuple(map(int, val.split()))
 
 	__globals__[name] = val
 	__all__.append(name)

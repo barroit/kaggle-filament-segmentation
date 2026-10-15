@@ -10,9 +10,10 @@ from os import makedirs
 from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
 
-dataset = 'dataset'
-output_prefix = f"{dataset}/preview"
-coco = COCO(f"{dataset}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")
+from lib.use_kconfig import *
+
+output = f"{CONFIG_DATASET_PREFIX}/preview/train"
+coco = COCO(f"{CONFIG_DATASET_PREFIX}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")
 
 def flat_to_points(coord):
 	x_set = coord[::2]
@@ -28,8 +29,7 @@ def draw_image(id):
 	anno_ids = coco.getAnnIds(imgIds=[id])
 	annos = coco.loadAnns(anno_ids)
 
-	filename = f"{dataset}/train/train_images/{info['file_name']}"
-	image_raw = Image.open(filename)
+	image_raw = Image.open(f"{CONFIG_DATASET_PREFIX}/train/train_images/{info['file_name']}")
 	image = image_raw.convert('RGB')
 	draw = ImageDraw.Draw(image, 'RGBA')
 
@@ -38,22 +38,25 @@ def draw_image(id):
 		coord = (x, y, x + width, y + height)
 		spine = flat_to_points(anno['spine'])
 
-		draw.rectangle(coord, outline=(255, 255, 0, 128), width=1)
+		draw.rectangle(coord, outline=CONFIG_PREVIEW_BBOX_RGBA,
+			       width=CONFIG_PREVIEW_BBOX_WIDTH)
 
 		for segs in anno['segmentation']:
 			polygon = flat_to_points(segs)
 
 			draw.line(polygon + polygon[:1],
-				  fill=(0, 255, 255, 30), width=1)
+				  fill=CONFIG_PREVIEW_BORDER_RGBA,
+				  width=CONFIG_PREVIEW_BORDER_WIDTH)
 
-		draw.line(spine, fill=(255, 0, 0, 30), width=1)
+		draw.line(spine, fill=CONFIG_PREVIEW_SPINE_RGBA,
+			  width=CONFIG_PREVIEW_SPINE_WIDTH)
 
-	image.save(f"{output_prefix}/{id}.png")
+	image.save(f"{output}/{id}.png")
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 	ids = coco.getImgIds()
 
-	makedirs(output_prefix, exist_ok=True)
+	makedirs(output, exist_ok=True)
 	pool.map(draw_image, ids)
