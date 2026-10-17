@@ -74,7 +74,7 @@ for name, info in images.items():
 			y = coord[1] / info['height']
 
 			label.write(f" {x:.12f} {y:.12f}")
-		
+
 		label.write('\n')
 
 	label.close()

@@ -12,11 +12,13 @@ __all__ = [
 	'coord_load_label',
 ]
 
-def coord_pack(flatten):
-	return array(flatten, dtype=int32).reshape(-1, 2)
-
 def coord_pack_float64(flatten):
 	return array(flatten, dtype=float64).reshape(-1, 2)
+
+def coord_pack(flatten):
+	coords_float = coord_pack_float64(flatten)
+
+	return rint(coords_float).astype(int32)
 
 def coord_load_bbox(bbox):
 	x, y, width, height = bbox
