@@ -11,9 +11,9 @@ from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
 
 from lib.kconfig import *
+from lib.path import *
 
-output = f"{CONFIG_DATASET_PREFIX}/preview/train"
-coco = COCO(f"{CONFIG_DATASET_PREFIX}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")
+coco = COCO(TRAIN_METADATA)
 
 def flat_to_points(coord):
 	x_set = coord[::2]
@@ -29,7 +29,7 @@ def draw_image(id):
 	anno_ids = coco.getAnnIds(imgIds=[id])
 	annos = coco.loadAnns(anno_ids)
 
-	image_raw = Image.open(f"{CONFIG_DATASET_PREFIX}/train/train_images/{info['file_name']}")
+	image_raw = Image.open(f"{TRAIN_IMAGE_DIR}/{info['file_name']}")
 	image = image_raw.convert('RGB')
 	draw = ImageDraw.Draw(image, 'RGBA')
 
@@ -51,12 +51,12 @@ def draw_image(id):
 		draw.line(spine, fill=CONFIG_PREVIEW_SPINE_RGBA,
 			  width=CONFIG_PREVIEW_SPINE_WIDTH)
 
-	image.save(f"{output}/{id}.png")
+	image.save(f"{PREVIEW_TRAIN_DIR}/{id}.png")
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 	ids = coco.getImgIds()
 
-	makedirs(output, exist_ok=True)
+	makedirs(PREVIEW_TRAIN_DIR)
 	pool.map(draw_image, ids)

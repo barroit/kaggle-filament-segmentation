@@ -13,9 +13,7 @@ from cv2 import IMREAD_COLOR, addWeighted as add_weighted, \
 from numpy import array, float64, int32, rint
 
 from lib.kconfig import *
-
-input = f"{CONFIG_DATASET_PREFIX}/yolo"
-output = f"{CONFIG_DATASET_PREFIX}/preview/yolo"
+from lib.path import *
 
 def rgba_to_bgra(rgba):
 	return (rgba[2], rgba[1], rgba[0], rgba[3])
@@ -63,19 +61,19 @@ def draw_image(task):
 			       border_alpha, 0)
 
 	stem = splitext(image_base)[0]
-	imwrite(f"{output}/{stem}.png", preview)
+	imwrite(f"{PREVIEW_YOLO_DIR}/{stem}.png", preview)
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 	tasks = None
 
-	images = glob(f"{input}/*/images/*.jpeg")
-	labels = glob(f"{input}/*/labels/*.txt")
+	images = glob(GLOB_YOLO_IMAGES)
+	labels = glob(GLOB_YOLO_LABELS)
 
 	images.sort()
 	labels.sort()
 	tasks = zip(images, labels)
 
-	makedirs(output, exist_ok=True)
+	makedirs(PREVIEW_YOLO_DIR)
 	pool.map(draw_image, tasks)

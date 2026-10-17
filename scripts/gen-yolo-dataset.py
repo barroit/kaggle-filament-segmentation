@@ -9,43 +9,44 @@ from glob import glob
 from os import link, makedirs
 from os.path import abspath, basename, splitext
 from random import Random
-from yaml import dump
+from yaml import dump as yaml_dump
 
 from pycocotools.coco import COCO
 
-from lib.kconfig import *
+from lib.path import *
 
-output = f"{CONFIG_DATASET_PREFIX}/yolo"
-
-paths = {}
+images = {}
 selected = {}
 
 days = set()
 verify_days = set()
 
-coco = COCO(f"{CONFIG_DATASET_PREFIX}/train/MAGFiLO_1.0_Annotations_kaggle2026_train.json")
+coco = COCO(TRAIN_METADATA)
 rand = Random(39)
 
-makedirs(f"{output}/train/images")
-makedirs(f"{output}/train/labels")
-makedirs(f"{output}/verify/images")
-makedirs(f"{output}/verify/labels")
+makedirs(YOLO_TRAIN_IMAGE_DIR)
+makedirs(YOLO_TRAIN_LABEL_DIR)
+makedirs(YOLO_VERIFY_IMAGE_DIR)
+makedirs(YOLO_VERIFY_LABEL_DIR)
 
-with open(f"{output}/dataset.yaml", 'w') as file:
-	dump({
-		'train': 'train/images',
-		'val': 'verify/images',
-		'names': { 0: 'filament' },
-	}, file, indent=3)
+with open(YOLO_METADATA, 'w') as file:
+	data = {
+		'train': YOLO_TRAIN_IMAGE_DIR.removeprefix(YOLO_PREFIX),
+		'val': YOLO_VERIFY_IMAGE_DIR.removeprefix(YOLO_PREFIX),
+		'names': {
+			0: 'filament',
+		},
+	}
 
-for path in glob(f"{CONFIG_DATASET_PREFIX}/train/train_images/*.jpeg"):
-	name = basename(path)
-	stem = splitext(name)[0]
-	paths[stem] = path
+	yaml_dump(data, file, indent=3)
+
+for path in glob(GLOB_TRAIN_IMAGES):
+	stem = path_resolve_stem(path)
+
+	images[stem] = path
 
 for info in coco.imgs.values():
-	name = basename(info['file_name'])
-	stem = splitext(name)[0]
+	stem = path_resolve_stem(info['file_name'])
 
 	if stem not in selected:
 		selected[stem] = info
@@ -60,21 +61,21 @@ for day in days[:len(days) // 5]:
 	verify_days.add(day)
 
 for stem, info in selected.items():
-	src_abs = abspath(paths[stem])
-	src_base = basename(paths[stem])
+	filename = abspath(images[stem])
+	name = basename(images[stem])
 	type = 'verify' if stem[:8] in verify_days else 'train'
 
 	width = info['width']
 	height = info['height']
 	lines = []
 
-	image = f"{output}/{type}/images/{src_base}"
-	label = f"{output}/{type}/labels/{stem}.txt"
+	image = f"{YOLO_PREFIX}/{type}/images/{name}"
+	label = f"{YOLO_PREFIX}/{type}/labels/{stem}.txt"
 
 	anno_ids = coco.getAnnIds(imgIds=[info['id']])
 	annos = coco.loadAnns(anno_ids)
 
-	link(src_abs, image)
+	link(filename, image)
 
 	for anno in annos:
 		polygon = anno['segmentation'][0]
