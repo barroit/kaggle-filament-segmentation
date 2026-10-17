@@ -5,91 +5,76 @@
 #
 # This only emits the first annotator's mark in the annotation set.
 
-from glob import glob
 from os import link, makedirs
-from os.path import abspath, basename, splitext
 from random import Random
 from yaml import dump as yaml_dump
 
 from pycocotools.coco import COCO
 
+from lib.coord import *
+from lib.kconfig import *
 from lib.path import *
 
 images = {}
-selected = {}
-
-days = set()
+train_days = set()
 verify_days = set()
 
 coco = COCO(TRAIN_METADATA)
-rand = Random(39)
+rand = Random(CONFIG_FOLD_SPLIT_SEED)
+metadata = None
 
 makedirs(YOLO_TRAIN_IMAGE_DIR)
 makedirs(YOLO_TRAIN_LABEL_DIR)
 makedirs(YOLO_VERIFY_IMAGE_DIR)
 makedirs(YOLO_VERIFY_LABEL_DIR)
 
-with open(YOLO_METADATA, 'w') as file:
-	data = {
-		'train': YOLO_TRAIN_IMAGE_DIR.removeprefix(YOLO_PREFIX),
-		'val': YOLO_VERIFY_IMAGE_DIR.removeprefix(YOLO_PREFIX),
-		'names': {
-			0: 'filament',
-		},
-	}
+metadata = open(YOLO_METADATA, 'w')
+yaml_dump({
+	'train': YOLO_TRAIN_IMAGE_DIR.removeprefix(YOLO_PREFIX),
+	'val': YOLO_VERIFY_IMAGE_DIR.removeprefix(YOLO_PREFIX),
+	'names': {
+		0: 'filament',
+	},
+}, metadata, indent=3)
 
-	yaml_dump(data, file, indent=3)
+for id, meta in coco.imgs.items():
+	name = id.split('-')[1]
 
-for path in glob(GLOB_TRAIN_IMAGES):
-	stem = path_resolve_stem(path)
+	if name not in images:
+		images[name] = meta
+		train_days.add(name[:CONFIG_FOLD_SPLIT_GRANULARITY])
 
-	images[stem] = path
+train_days = sorted(train_days)
+rand.shuffle(train_days)
 
-for info in coco.imgs.values():
-	stem = path_resolve_stem(info['file_name'])
-
-	if stem not in selected:
-		selected[stem] = info
-
-for stem in selected:
-	days.add(stem[:8])
-
-days = sorted(days)
-rand.shuffle(days)
-
-for day in days[:len(days) // 5]:
+for day in train_days[:len(train_days) * CONFIG_FOLD_VERIFY_RATIO // 10]:
 	verify_days.add(day)
 
-for stem, info in selected.items():
-	filename = abspath(images[stem])
-	name = basename(images[stem])
-	type = 'verify' if stem[:8] in verify_days else 'train'
+for name, info in images.items():
+	filename = info['file_name']
+	image_prefix = YOLO_TRAIN_IMAGE_DIR
+	label_prefix = YOLO_TRAIN_LABEL_DIR
 
-	width = info['width']
-	height = info['height']
-	lines = []
+	label = None
+	annos = coco.imgToAnns[info['id']]
 
-	image = f"{YOLO_PREFIX}/{type}/images/{name}"
-	label = f"{YOLO_PREFIX}/{type}/labels/{stem}.txt"
+	if name[:CONFIG_FOLD_SPLIT_GRANULARITY] in verify_days:
+		image_prefix = YOLO_VERIFY_IMAGE_DIR
+		label_prefix = YOLO_VERIFY_LABEL_DIR
 
-	anno_ids = coco.getAnnIds(imgIds=[info['id']])
-	annos = coco.loadAnns(anno_ids)
-
-	link(filename, image)
+	link(f"{TRAIN_IMAGE_DIR}/{filename}", f"{image_prefix}/{filename}")
+	label = open(f"{label_prefix}/{name}.txt", 'w')
 
 	for anno in annos:
-		polygon = anno['segmentation'][0]
-		coords = []
+		coords = coord_pack_float64(anno['segmentation'][0])
 
-		for idx, val in enumerate(polygon):
-			scale = width
+		label.write('0')
+		for coord in coords:
+			x = coord[0] / info['width']
+			y = coord[1] / info['height']
 
-			if idx % 2 != 0:
-				scale = height
+			label.write(f" {x:.12f} {y:.12f}")
+		
+		label.write('\n')
 
-			coords.append(f"{val / scale:.12f}")
-
-		lines.append('0 ' + ' '.join(coords))
-
-	with open(label, 'w') as file:
-		file.write('\n'.join(lines) + '\n')
+	label.close()

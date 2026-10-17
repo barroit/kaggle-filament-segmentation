@@ -7,56 +7,69 @@
 from multiprocessing import Pool, cpu_count
 from os import makedirs
 
-from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
 
+from lib.color import *
+from lib.coord import *
+from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
 coco = COCO(TRAIN_METADATA)
 
-def flat_to_points(coord):
-	x_set = coord[::2]
-	y_set = coord[1::2]
+def draw(task):
+	input, output, annos = task
+	image = draw_load(input)
 
-	coord_set = zip(x_set, y_set)
-	points = list(coord_set)
+	bbox_color = color_rgba_to_bgra(CONFIG_PREVIEW_BBOX_RGBA)
+	bbox_alpha = color_alpha_percent(bbox_color)
 
-	return points
+	spine_color = color_rgba_to_bgra(CONFIG_PREVIEW_SPINE_RGBA)
+	spine_alpha = color_alpha_percent(spine_color)
 
-def draw_image(id):
-	info = coco.loadImgs([id])[0]
-	anno_ids = coco.getAnnIds(imgIds=[id])
-	annos = coco.loadAnns(anno_ids)
-
-	image_raw = Image.open(f"{TRAIN_IMAGE_DIR}/{info['file_name']}")
-	image = image_raw.convert('RGB')
-	draw = ImageDraw.Draw(image, 'RGBA')
+	border_color = color_rgba_to_bgra(CONFIG_PREVIEW_BORDER_RGBA)
+	border_alpha = color_alpha_percent(border_color)
 
 	for anno in annos:
-		x, y, width, height = anno['bbox']
-		coord = (x, y, x + width, y + height)
-		spine = flat_to_points(anno['spine'])
+		bbox = coord_load_bbox(anno['bbox'])
+		spine = coord_pack(anno['spine'])
+		border = coord_pack(anno['segmentation'][0])
 
-		draw.rectangle(coord, outline=CONFIG_PREVIEW_BBOX_RGBA,
-			       width=CONFIG_PREVIEW_BBOX_WIDTH)
+		overlay = image.copy()
 
-		for segs in anno['segmentation']:
-			polygon = flat_to_points(segs)
+		draw_rectangle(overlay, bbox, bbox_color,
+			       CONFIG_PREVIEW_BBOX_WIDTH)
+		image = draw_blend(image, overlay, bbox_alpha)
 
-			draw.line(polygon + polygon[:1],
-				  fill=CONFIG_PREVIEW_BORDER_RGBA,
-				  width=CONFIG_PREVIEW_BORDER_WIDTH)
+		overlay = image.copy()
+		draw_polyline(overlay, spine, spine_color,
+			      CONFIG_PREVIEW_SPINE_WIDTH)
+		image = draw_blend(image, overlay, spine_alpha)
 
-		draw.line(spine, fill=CONFIG_PREVIEW_SPINE_RGBA,
-			  width=CONFIG_PREVIEW_SPINE_WIDTH)
+		overlay = image.copy()
+		draw_polyline(overlay, border, border_color,
+			      CONFIG_PREVIEW_BORDER_WIDTH)
+		image = draw_blend(image, overlay, border_alpha)
 
-	image.save(f"{PREVIEW_TRAIN_DIR}/{id}.png")
+	draw_dump(image, output)
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
+
+	coco = COCO(TRAIN_METADATA)
 	ids = coco.getImgIds()
+	tasks = []
+
+	for id in ids:
+		annotator, name = id.split('-')
+		filename = coco.imgs[id]['file_name']
+
+		input = f"{TRAIN_IMAGE_DIR}/{filename}"
+		output = f"{PREVIEW_TRAIN_DIR}/{name}-{annotator}.png"
+		annos = coco.imgToAnns[id]
+
+		tasks.append([input, output, annos])
 
 	makedirs(PREVIEW_TRAIN_DIR)
-	pool.map(draw_image, ids)
+	pool.map(draw, tasks)

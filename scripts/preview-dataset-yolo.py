@@ -6,74 +6,57 @@
 from glob import glob
 from multiprocessing import Pool, cpu_count
 from os import makedirs
-from os.path import basename, splitext
 
-from cv2 import IMREAD_COLOR, addWeighted as add_weighted, \
-		fillPoly as fill_poly, imread, imwrite, polylines
-from numpy import array, float64, int32, rint
-
+from lib.color import *
+from lib.coord import *
+from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
-def rgba_to_bgra(rgba):
-	return (rgba[2], rgba[1], rgba[0], rgba[3])
+def glob_and_sort(pattern):
+	files = glob(pattern)
+
+	files.sort()
+	return files
 
 def draw_image(task):
-	image_path, label_path = task
-	image_base = basename(image_path)
-	stem = None
-
-	image = imread(image_path, IMREAD_COLOR)
+	image_input, label_input, output = task
+	image = draw_load(image_input)
 	height, width = image.shape[:2]
+	label = open(label_input)
 
-	overlay = image.copy()
-	border_overlay = None
-	preview = None
-	polygons = []
+	fill_color = color_rgba_to_bgra(CONFIG_PREVIEW_SPINE_RGBA)
+	fill_alpha = color_alpha_percent(fill_color)
 
-	fill_color = rgba_to_bgra(CONFIG_PREVIEW_SPINE_RGBA)
-	border_color = rgba_to_bgra(CONFIG_PREVIEW_BORDER_RGBA)
-	fill_alpha = None
-	border_alpha = None
+	border_color = color_rgba_to_bgra(CONFIG_PREVIEW_BORDER_RGBA)
+	border_alpha = color_alpha_percent(border_color)
 
-	with open(label_path) as label:
-		for line in label:
-			cols = line.split()
-			coords = array(cols[1:], dtype=float64)
+	for line in label:
+		coords = coord_load_label(line, width, height)
+		overlay = image.copy()
 
-			pairs = coords.reshape(-1, 2)
-			points = rint(pairs * [width, height])
-			polygon = points.astype(int32)
+		draw_fill_polygon(overlay, [coords], fill_color)
+		image = draw_blend(image, overlay, fill_alpha)
 
-			polygons.append(polygon)
-			fill_poly(overlay, [polygon], fill_color[:3])
+		overlay = image.copy()
+		draw_polyline(overlay, coords, border_color,
+			      CONFIG_PREVIEW_BORDER_WIDTH)
+		image = draw_blend(image, overlay, border_alpha)
 
-	fill_alpha = fill_color[3] / 255
-	preview = add_weighted(image, 1 - fill_alpha, overlay, fill_alpha, 0)
-	border_overlay = preview.copy()
-
-	for polygon in polygons:
-		polylines(border_overlay, [polygon], True, border_color[:3],
-			  CONFIG_PREVIEW_BORDER_WIDTH)
-
-	border_alpha = border_color[3] / 255
-	preview = add_weighted(preview, 1 - border_alpha, border_overlay,
-			       border_alpha, 0)
-
-	stem = splitext(image_base)[0]
-	imwrite(f"{PREVIEW_YOLO_DIR}/{stem}.png", preview)
+	draw_dump(image, output)
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
-	tasks = None
 
-	images = glob(GLOB_YOLO_IMAGES)
-	labels = glob(GLOB_YOLO_LABELS)
+	image_inputs = glob_and_sort(GLOB_YOLO_IMAGES)
+	label_inputs = glob_and_sort(GLOB_YOLO_LABELS)
 
-	images.sort()
-	labels.sort()
-	tasks = zip(images, labels)
+	image_names = map(path_resolve_stem, image_inputs)
+	outputs = map(lambda name: f"{PREVIEW_YOLO_DIR}/{name}.png",
+		      image_names)
+
+	tasks = zip(image_inputs, label_inputs, outputs)
 
 	makedirs(PREVIEW_YOLO_DIR)
 	pool.map(draw_image, tasks)
