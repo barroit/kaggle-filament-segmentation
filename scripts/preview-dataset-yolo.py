@@ -13,6 +13,18 @@ from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
+fill_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
+fill_alpha = color_alpha_percent(fill_color)
+
+border_color = color_rgba_to_bgra(CONFIG_DRAW_BORDER_RGBA)
+border_alpha = color_alpha_percent(border_color)
+
+label_color = color_rgba_to_bgra(CONFIG_DRAW_TEXT_RGBA)
+label_alpha = color_alpha_percent(label_color)
+
+label_border_color = color_rgba_to_bgra(CONFIG_DRAW_TEXT_BORDER_RGBA)
+label_border_alpha = color_alpha_percent(label_border_color)
+
 def glob_and_sort(pattern):
 	files = glob(pattern)
 
@@ -22,18 +34,13 @@ def glob_and_sort(pattern):
 def draw_image(task):
 	image_input, label_input, output = task
 	image = draw_load(image_input)
-	height, width = image.shape[:2]
 	label = open(label_input)
 
-	fill_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
-	fill_alpha = color_alpha_percent(fill_color)
-
-	border_color = color_rgba_to_bgra(CONFIG_DRAW_BORDER_RGBA)
-	border_alpha = color_alpha_percent(border_color)
-
-	for line in label:
-		coords = coord_load_label_yolo(line, width, height)
+	for __idx, line in enumerate(label):
+		coords = coord_load_label_yolo(line)
+		bbox = coord_calc_bbox_yolo(coords)
 		overlay = image.copy()
+		idx = str(__idx + 1)
 
 		draw_fill_polygon(overlay, [coords], fill_color)
 		image = draw_blend(image, overlay, fill_alpha)
@@ -42,6 +49,11 @@ def draw_image(task):
 		draw_polyline(overlay, coords, border_color,
 			      CONFIG_DRAW_BORDER_WIDTH)
 		image = draw_blend(image, overlay, border_alpha)
+
+		overlay = image.copy()
+		draw_text(overlay, bbox, idx, label_color)
+		draw_text_border(overlay, bbox, idx, label_border_color)
+		image = draw_blend(image, overlay, label_border_alpha)
 
 	draw_dump(image, output)
 

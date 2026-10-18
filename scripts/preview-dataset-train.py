@@ -15,26 +15,30 @@ from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
-coco = COCO(TRAIN_METADATA)
+bbox_color = color_rgba_to_bgra(CONFIG_DRAW_BBOX_RGBA)
+bbox_alpha = color_alpha_percent(bbox_color)
+
+spine_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
+spine_alpha = color_alpha_percent(spine_color)
+
+border_color = color_rgba_to_bgra(CONFIG_DRAW_BORDER_RGBA)
+border_alpha = color_alpha_percent(border_color)
+
+label_color = color_rgba_to_bgra(CONFIG_DRAW_TEXT_RGBA)
+label_alpha = color_alpha_percent(label_color)
+
+label_border_color = color_rgba_to_bgra(CONFIG_DRAW_TEXT_BORDER_RGBA)
+label_border_alpha = color_alpha_percent(label_border_color)
 
 def draw(task):
 	input, output, annos = task
 	image = draw_load(input)
 
-	bbox_color = color_rgba_to_bgra(CONFIG_DRAW_BBOX_RGBA)
-	bbox_alpha = color_alpha_percent(bbox_color)
-
-	spine_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
-	spine_alpha = color_alpha_percent(spine_color)
-
-	border_color = color_rgba_to_bgra(CONFIG_DRAW_BORDER_RGBA)
-	border_alpha = color_alpha_percent(border_color)
-
-	for anno in annos:
+	for __idx, anno in enumerate(annos):
 		bbox = coord_load_bbox_coco(anno['bbox'])
 		spine = coord_pack(anno['spine'])
 		border = coord_pack(anno['segmentation'][0])
-
+		idx = str(__idx + 1)
 		overlay = image.copy()
 
 		draw_rectangle(overlay, bbox, bbox_color,
@@ -50,6 +54,11 @@ def draw(task):
 		draw_polyline(overlay, border, border_color,
 			      CONFIG_DRAW_BORDER_WIDTH)
 		image = draw_blend(image, overlay, border_alpha)
+
+		overlay = image.copy()
+		draw_text(overlay, bbox[0], idx, label_color)
+		draw_text_border(overlay, bbox[0], idx, label_border_color)
+		image = draw_blend(image, overlay, label_border_alpha)
 
 	draw_dump(image, output)
 

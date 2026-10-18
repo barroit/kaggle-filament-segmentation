@@ -4,7 +4,7 @@ menu "Preview"
 
 config DRAW_BBOX_RGBA
 	string "Bounding box color"
-	default "255 255 0 139"
+	default "255 255 0 50"
 
 config DRAW_BBOX_WIDTH
 	int "Bounding box width"
@@ -25,5 +25,25 @@ config DRAW_SPINE_RGBA
 config DRAW_SPINE_WIDTH
 	int "Spine width"
 	default 1
+
+config DRAW_FONT_SCALE
+	int "Font scale in tenths"
+	default 5
+
+config DRAW_FONT_THICKNESS
+	int "Font thickness in pixels"
+	default 1
+
+config DRAW_FONT_BORDER_WIDTH
+	int "Font border width in pixels"
+	default 1
+
+config DRAW_TEXT_RGBA
+	string "Text color"
+	default "255 0 255 239"
+
+config DRAW_TEXT_BORDER_RGBA
+	string "Text border color"
+	default "255 255 255 239"
 
 endmenu # Preview

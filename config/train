@@ -2,6 +2,10 @@
 
 menu "Training"
 
+config IMAGE_DIMENSION
+	int "Training image dimension"
+	default 2048
+
 config FOLD_SPLIT_SEED
 	int "Fold splitting shuffle seed"
 	default 39
