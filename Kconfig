@@ -4,6 +4,6 @@ mainmenu "$(first-line,README) Configuration"
 
 $(warn-off)
 
+source "config/draw"
 source "config/path"
-source "config/preview"
 source "config/train"

@@ -25,10 +25,10 @@ def draw_image(task):
 	height, width = image.shape[:2]
 	label = open(label_input)
 
-	fill_color = color_rgba_to_bgra(CONFIG_PREVIEW_SPINE_RGBA)
+	fill_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
 	fill_alpha = color_alpha_percent(fill_color)
 
-	border_color = color_rgba_to_bgra(CONFIG_PREVIEW_BORDER_RGBA)
+	border_color = color_rgba_to_bgra(CONFIG_DRAW_BORDER_RGBA)
 	border_alpha = color_alpha_percent(border_color)
 
 	for line in label:
@@ -40,7 +40,7 @@ def draw_image(task):
 
 		overlay = image.copy()
 		draw_polyline(overlay, coords, border_color,
-			      CONFIG_PREVIEW_BORDER_WIDTH)
+			      CONFIG_DRAW_BORDER_WIDTH)
 		image = draw_blend(image, overlay, border_alpha)
 
 	draw_dump(image, output)

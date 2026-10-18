@@ -21,13 +21,13 @@ def draw(task):
 	input, output, annos = task
 	image = draw_load(input)
 
-	bbox_color = color_rgba_to_bgra(CONFIG_PREVIEW_BBOX_RGBA)
+	bbox_color = color_rgba_to_bgra(CONFIG_DRAW_BBOX_RGBA)
 	bbox_alpha = color_alpha_percent(bbox_color)
 
-	spine_color = color_rgba_to_bgra(CONFIG_PREVIEW_SPINE_RGBA)
+	spine_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
 	spine_alpha = color_alpha_percent(spine_color)
 
-	border_color = color_rgba_to_bgra(CONFIG_PREVIEW_BORDER_RGBA)
+	border_color = color_rgba_to_bgra(CONFIG_DRAW_BORDER_RGBA)
 	border_alpha = color_alpha_percent(border_color)
 
 	for anno in annos:
@@ -38,17 +38,17 @@ def draw(task):
 		overlay = image.copy()
 
 		draw_rectangle(overlay, bbox, bbox_color,
-			       CONFIG_PREVIEW_BBOX_WIDTH)
+			       CONFIG_DRAW_BBOX_WIDTH)
 		image = draw_blend(image, overlay, bbox_alpha)
 
 		overlay = image.copy()
 		draw_polyline(overlay, spine, spine_color,
-			      CONFIG_PREVIEW_SPINE_WIDTH)
+			      CONFIG_DRAW_SPINE_WIDTH)
 		image = draw_blend(image, overlay, spine_alpha)
 
 		overlay = image.copy()
 		draw_polyline(overlay, border, border_color,
-			      CONFIG_PREVIEW_BORDER_WIDTH)
+			      CONFIG_DRAW_BORDER_WIDTH)
 		image = draw_blend(image, overlay, border_alpha)
 
 	draw_dump(image, output)
