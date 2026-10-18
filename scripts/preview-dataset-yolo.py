@@ -32,7 +32,7 @@ def draw_image(task):
 	border_alpha = color_alpha_percent(border_color)
 
 	for line in label:
-		coords = coord_load_label(line, width, height)
+		coords = coord_load_label_yolo(line, width, height)
 		overlay = image.copy()
 
 		draw_fill_polygon(overlay, [coords], fill_color)

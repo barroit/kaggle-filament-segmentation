@@ -31,7 +31,7 @@ def draw(task):
 	border_alpha = color_alpha_percent(border_color)
 
 	for anno in annos:
-		bbox = coord_load_bbox(anno['bbox'])
+		bbox = coord_load_bbox_coco(anno['bbox'])
 		spine = coord_pack(anno['spine'])
 		border = coord_pack(anno['segmentation'][0])
 
