@@ -26,8 +26,9 @@ for symbol in kconfig.unique_defined_syms:
 		val = int(val)
 	elif symbol.type == HEX:
 		val = int(val, 16)
-	elif symbol.type == STRING and symbol.name.endswith('_RGBA'):
-		val = tuple(map(int, val.split()))
+	elif symbol.type == STRING:
+		if symbol.name.endswith(('_RGBA', '_DIMENSION')):
+			val = tuple(map(int, val.split()))
 
 	__globals__[name] = val
 	__all__.append(name)

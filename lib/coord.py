@@ -37,7 +37,7 @@ def coord_load_label_yolo(line):
 	cols = line.split()
 	scale = coord_pack_float64(cols[1:])
 
-	return rint(scale * ([CONFIG_IMAGE_DIMENSION] * 2)).astype(int32)
+	return rint(scale * CONFIG_IMAGE_DIMENSION).astype(int32)
 
 def coord_calc_bbox_yolo(coords):
 	x, y, width, height = bounding_rect(coords)

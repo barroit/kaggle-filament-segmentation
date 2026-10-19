@@ -48,7 +48,7 @@ def draw_text(image, xy, text, color):
 
 def draw_text_border(image, xy, text, color):
 	__draw_text(image, xy, text, color,
-		    CONFIG_DRAW_FONT_THICKNESS + CONFIG_DRAW_FONT_BORDER_WIDTH)
+		    CONFIG_DRAW_FONT_THICKNESS + CONFIG_DRAW_TEXT_BORDER_WIDTH)
 
 def draw_dump(image, path):
 	imwrite(path, image)

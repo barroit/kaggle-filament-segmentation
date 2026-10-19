@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+menu "Input and output directories"
+
+config DATASET_DIR
+	string "Dataset root directory"
+	default "dataset"
+
+config PREDICTION_DIR
+	string "Prediction output directory"
+	default "runs"
+
+config EVALUATION_DIR
+	string "Evaluation metrics directory"
+	default "metrics"
+
+endmenu # Input and output directories
+
+menu "Dataset parameters"
+
+config IMAGE_DIMENSION
+	string "YOLO input image dimensions (width height in pixels)"
+	default "2048 2048"
+
+config SUN_DISK_RADIUS
+	int "Solar disk radius in pixels"
+	depends on DROP_LIMB
+	default 900
+
+endmenu # Dataset parameters

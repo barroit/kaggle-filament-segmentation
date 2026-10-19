@@ -19,12 +19,12 @@ from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
 
-iou_threshold = CONFIG_EVAL_YOLO_IOU_THRESHOLD / 100
-cr_threshold = CONFIG_EVAL_YOLO_CR_THRESHOLD / 100
+iou_threshold = CONFIG_YOLO_MATCH_IOU_MIN / 100
+cr_threshold = CONFIG_YOLO_CROP_RECALL_COVERAGE_MIN / 100
 
-cr_threshold_str = str(CONFIG_EVAL_YOLO_CR_THRESHOLD)
+cr_threshold_str = str(CONFIG_YOLO_CROP_RECALL_COVERAGE_MIN)
 
-prefix = f"{CONFIG_EVALUATION_PREFIX}/{argv[1]}"
+prefix = f"{CONFIG_EVALUATION_DIR}/{argv[1]}"
 
 label_inputs = dict()
 gt_shapes = dict()
@@ -38,10 +38,10 @@ cr_count = 0
 dr_count = 0
 pred_count = 0
 
-model = yolo(f"{CONFIG_PREDICTION_PREFIX}/{argv[1]}/weights/best.pt")
+model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=TRAIN_IMAGE_DIR, stream=True, save=False,
 		       verbose=False, retina_masks=True, device=0,
-		       batch=CONFIG_EVAL_YOLO_BATCH)
+		       batch=CONFIG_YOLO_EVAL_BATCH)
 
 summary_plot = subplots(2, 4, figsize=(25.6, 12.8))
 summary_fig = summary_plot[0]

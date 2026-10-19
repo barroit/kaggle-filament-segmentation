@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+menu "YOLO evaluation"
+
+config YOLO_EVAL_BATCH
+	int "Prediction batch size"
+	default 32
+
+config YOLO_MATCH_IOU_MIN
+	int "Minimum mask IoU for GT matching in percent"
+	range 0 100
+	default 50
+
+config YOLO_CROP_RECALL_COVERAGE_MIN
+	int "Minimum GT coverage for crop recall in percent"
+	range 0 100
+	default 95
+
+endmenu # YOLO evaluation

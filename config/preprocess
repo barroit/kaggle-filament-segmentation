@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+menu "Data preprocessing"
+
+config DROP_LIMB
+	bool "Erase the solar limb from input images"
+	default y
+
+config FIRST_ANNOTATOR_ONLY
+	bool "Use annotations from the first annotator (index 0) only"
+	default n
+
+config USE_FOLD
+	bool "Enable K-fold dataset partitioning"
+	default y
+
+endmenu # Data preprocessing configuration
+
+menu "K-fold partitioning"
+	depends on USE_FOLD
+
+config NR_FOLDS
+	int "Number of folds (K)"
+	default 5
+
+config FOLD_PRNG_SEED
+	int "PRNG seed for fold shuffling"
+	default 39
+
+choice
+	prompt "Temporal grouping granularity"
+	default OBSERVE_TEMPORAL_UNIT_DATE
+
+config OBSERVE_TEMPORAL_UNIT_DATE
+	bool "By date (YYYYMMDD)"
+
+config OBSERVE_TEMPORAL_UNIT_HOUR
+	bool "By hour (YYYYMMDDHH)"
+
+config OBSERVE_TEMPORAL_UNIT_MINUTE
+	bool "By minute (YYYYMMDDHHMM)"
+
+endchoice
+
+config OBSERVE_TEMPORAL_UNIT
+	int
+	default 8 if OBSERVE_TEMPORAL_UNIT_DATE
+	default 10 if OBSERVE_TEMPORAL_UNIT_HOUR
+	default 12 if OBSERVE_TEMPORAL_UNIT_MINUTE
+
+endmenu # K-fold partitioning configuration

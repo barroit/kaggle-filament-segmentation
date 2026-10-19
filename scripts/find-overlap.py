@@ -23,7 +23,7 @@ def find(label_input):
 
 	for line in label:
 		coords = coord_load_label_yolo(line)
-		mask = zeros([CONFIG_IMAGE_DIMENSION] * 2, dtype=uint8)
+		mask = zeros(CONFIG_IMAGE_DIMENSION[::-1], dtype=uint8)
 
 		fill_poly(mask, [coords], 1)
 		masks.append(mask)

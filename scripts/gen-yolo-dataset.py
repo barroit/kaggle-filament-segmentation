@@ -20,7 +20,7 @@ train_days = set()
 verify_days = set()
 
 coco = COCO(TRAIN_METADATA)
-rand = Random(CONFIG_FOLD_SPLIT_SEED)
+rand = Random(CONFIG_FOLD_PRNG_SEED)
 metadata = None
 
 makedirs(YOLO_TRAIN_IMAGE_DIR)
@@ -42,12 +42,12 @@ for id, meta in coco.imgs.items():
 
 	if name not in images:
 		images[name] = meta
-		train_days.add(name[:CONFIG_FOLD_SPLIT_GRANULARITY])
+		train_days.add(name[:CONFIG_OBSERVE_TEMPORAL_UNIT])
 
 train_days = sorted(train_days)
 rand.shuffle(train_days)
 
-for day in train_days[:len(train_days) * CONFIG_FOLD_VERIFY_RATIO // 10]:
+for day in train_days[:len(train_days) // CONFIG_NR_FOLDS]:
 	verify_days.add(day)
 
 for name, info in images.items():
@@ -58,7 +58,7 @@ for name, info in images.items():
 	label = None
 	annos = coco.imgToAnns[info['id']]
 
-	if name[:CONFIG_FOLD_SPLIT_GRANULARITY] in verify_days:
+	if name[:CONFIG_OBSERVE_TEMPORAL_UNIT] in verify_days:
 		image_prefix = YOLO_VERIFY_IMAGE_DIR
 		label_prefix = YOLO_VERIFY_LABEL_DIR
 

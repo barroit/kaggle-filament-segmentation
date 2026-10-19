@@ -1,29 +1,29 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "Preview"
+menu "Preview appearance"
 
 config DRAW_BBOX_RGBA
-	string "Bounding box color"
+	string "Bounding box color in RGBA"
 	default "255 255 0 50"
 
 config DRAW_BBOX_WIDTH
-	int "Bounding box width"
+	int "Bounding box width in pixels"
 	default 1
 
 config DRAW_BORDER_RGBA
-	string "Border color"
+	string "Border color in RGBA"
 	default "0 255 255 50"
 
 config DRAW_BORDER_WIDTH
-	int "Border width"
+	int "Border width in pixels"
 	default 1
 
 config DRAW_SPINE_RGBA
-	string "Spine color"
+	string "Spine color in RGBA"
 	default "255 0 0 30"
 
 config DRAW_SPINE_WIDTH
-	int "Spine width"
+	int "Spine width in pixels"
 	default 1
 
 config DRAW_FONT_SCALE
@@ -34,16 +34,16 @@ config DRAW_FONT_THICKNESS
 	int "Font thickness in pixels"
 	default 1
 
-config DRAW_FONT_BORDER_WIDTH
-	int "Font border width in pixels"
-	default 1
-
 config DRAW_TEXT_RGBA
-	string "Text color"
+	string "Text color in RGBA"
 	default "255 0 255 239"
 
 config DRAW_TEXT_BORDER_RGBA
-	string "Text border color"
+	string "Text border color in RGBA"
 	default "255 255 255 239"
 
-endmenu # Preview
+config DRAW_TEXT_BORDER_WIDTH
+	int "Font border width in pixels"
+	default 1
+
+endmenu # Preview rendering settings

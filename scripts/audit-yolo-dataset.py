@@ -40,7 +40,7 @@ for name, info in images.items():
 	image_path = f"{image_dir}/{info['file_name']}"
 
 	days = train_days if is_train else verify_days
-	days.add(name[:CONFIG_FOLD_SPLIT_GRANULARITY])
+	days.add(name[:CONFIG_OBSERVE_TEMPORAL_UNIT])
 
 	assert samefile(image_path, f"{TRAIN_IMAGE_DIR}/{info['file_name']}"), \
 	       name

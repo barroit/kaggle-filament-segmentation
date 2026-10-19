@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 def mask_from_coords(coords):
-	mask = zeros([CONFIG_IMAGE_DIMENSION] * 2, dtype=uint8)
+	mask = zeros(CONFIG_IMAGE_DIMENSION[::-1], dtype=uint8)
 
 	fill_poly(mask, [coords], 1)
 	return mask

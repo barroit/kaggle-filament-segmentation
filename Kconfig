@@ -4,7 +4,10 @@ mainmenu "$(first-line,README) Configuration"
 
 $(warn-off)
 
-source "config/draw"
-source "config/path"
-source "config/train"
-source "config/eval"
+source "config/preprocess"
+
+source "config/runtime"
+
+source "config/evaluation"
+
+source "config/preview"
