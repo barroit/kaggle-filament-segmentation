@@ -2,7 +2,7 @@
 
 menu "YOLO evaluation"
 
-config YOLO_EVAL_BATCH
+config YOLO_PRED_BATCH
 	int "Prediction batch size"
 	default 32
 

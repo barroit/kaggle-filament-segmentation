@@ -41,7 +41,7 @@ pred_count = 0
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=TRAIN_IMAGE_DIR, stream=True, save=False,
 		       verbose=False, retina_masks=True, device=0,
-		       batch=CONFIG_YOLO_EVAL_BATCH)
+		       batch=CONFIG_YOLO_PRED_BATCH)
 
 summary_plot = subplots(2, 4, figsize=(25.6, 12.8))
 summary_fig = summary_plot[0]

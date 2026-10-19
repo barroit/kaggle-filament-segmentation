@@ -2,8 +2,12 @@
 
 menu "Input and output directories"
 
+config MAGFILO_DIR
+	string "MAGFiLO dataset directory"
+	default "magfilo"
+
 config DATASET_DIR
-	string "Dataset root directory"
+	string "Preprocessed dataset directory"
 	default "dataset"
 
 config PREDICTION_DIR
