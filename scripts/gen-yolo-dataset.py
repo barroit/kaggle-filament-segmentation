@@ -30,8 +30,8 @@ makedirs(YOLO_VERIFY_LABEL_DIR)
 
 metadata = open(YOLO_METADATA, 'w')
 yaml_dump({
-	'train': YOLO_TRAIN_IMAGE_DIR.removeprefix(YOLO_PREFIX),
-	'val': YOLO_VERIFY_IMAGE_DIR.removeprefix(YOLO_PREFIX),
+	'train': YOLO_TRAIN_IMAGE_DIR.removeprefix(f"{YOLO_PREFIX}/"),
+	'val': YOLO_VERIFY_IMAGE_DIR.removeprefix(f"{YOLO_PREFIX}/"),
 	'names': {
 		0: 'filament',
 	},
