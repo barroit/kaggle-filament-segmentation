@@ -3,7 +3,15 @@
 menu "Path"
 
 config DATASET_PREFIX
-	string "Dataset directory path"
+	string "Dataset directory"
 	default "dataset"
+
+config PREDICTION_PREFIX
+	string "Inference result directory"
+	default "runs"
+
+config EVALUATION_PREFIX
+	string "Evaluation data directory"
+	default "metrics"
 
 endmenu # Path

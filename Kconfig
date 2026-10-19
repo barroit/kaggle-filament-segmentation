@@ -7,3 +7,4 @@ $(warn-off)
 source "config/draw"
 source "config/path"
 source "config/train"
+source "config/eval"
