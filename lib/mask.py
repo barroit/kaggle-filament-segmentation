@@ -21,7 +21,7 @@ def mask_from_coords(coords):
 
 def mask_calc_iou(mask_a, mask_b):
 	intersection = count_nonzero(mask_a & mask_b)
-	union = count_nonzero(mask_a | mask_b) - intersection
+	union = count_nonzero(mask_a | mask_b)
 	iou = intersection / union
 
 	return iou
