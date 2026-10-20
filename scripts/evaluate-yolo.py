@@ -279,7 +279,7 @@ def produce_detection_precision():
 
 makedirs(prefix)
 
-for path in glob(GLOB_YOLO_LABELS):
+for path in glob(DATASET_YOLO_LABEL_GLOB):
 	name = path_resolve_stem(path)
 
 	label_inputs[name] = path

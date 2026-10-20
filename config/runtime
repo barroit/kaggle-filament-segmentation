@@ -4,7 +4,7 @@ menu "Input and output directories"
 
 config MAGFILO_DIR
 	string "MAGFiLO dataset directory"
-	default "magfilo"
+	default "magfilo/train"
 
 config DATASET_DIR
 	string "Preprocessed dataset directory"

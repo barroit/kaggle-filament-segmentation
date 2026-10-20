@@ -47,7 +47,7 @@ if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 
-	label_inputs = glob(GLOB_YOLO_LABELS)
+	label_inputs = glob(DATASET_YOLO_LABEL_GLOB)
 	worker_results = pool.map(find, label_inputs)
 	results = list(chain.from_iterable(worker_results))
 

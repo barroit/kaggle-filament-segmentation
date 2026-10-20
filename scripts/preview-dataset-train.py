@@ -15,6 +15,8 @@ from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
+prefix = f"{DATASET_PREVIEW_DIR}/train"
+
 bbox_color = color_rgba_to_bgra(CONFIG_DRAW_BBOX_RGBA)
 bbox_alpha = color_alpha_percent(bbox_color)
 
@@ -31,8 +33,8 @@ label_border_color = color_rgba_to_bgra(CONFIG_DRAW_TEXT_BORDER_RGBA)
 label_border_alpha = color_alpha_percent(label_border_color)
 
 def draw(task):
-	input, output, annos = task
-	image = draw_load(input)
+	src, dst, annos = task
+	image = draw_load(src)
 
 	for __idx, anno in enumerate(annos):
 		bbox = coord_load_bbox_coco(anno['bbox'])
@@ -60,13 +62,13 @@ def draw(task):
 		draw_text_border(overlay, bbox[0], idx, label_border_color)
 		image = draw_blend(image, overlay, label_border_alpha)
 
-	draw_dump(image, output)
+	draw_dump(image, dst)
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 
-	coco = COCO(TRAIN_METADATA)
+	coco = COCO(MAGFILO_METADATA_FILE)
 	ids = coco.getImgIds()
 	tasks = []
 
@@ -74,11 +76,11 @@ if __name__ == '__main__':
 		annotator, name = id.split('-')
 		filename = coco.imgs[id]['file_name']
 
-		input = f"{TRAIN_IMAGE_DIR}/{filename}"
-		output = f"{PREVIEW_TRAIN_DIR}/{name}-{annotator}.png"
+		src = f"{MAGFILO_IMAGE_DIR}/{filename}"
+		dst = f"{prefix}/{name}-{annotator}.png"
 		annos = coco.imgToAnns[id]
 
-		tasks.append([input, output, annos])
+		tasks.append([src, dst, annos])
 
-	makedirs(PREVIEW_TRAIN_DIR)
+	makedirs(prefix)
 	pool.map(draw, tasks)

@@ -15,7 +15,7 @@ from lib.coord import *
 from lib.kconfig import *
 from lib.path import *
 
-coco = COCO(TRAIN_METADATA)
+coco = COCO(MAGFILO_METADATA_FILE)
 images = {}
 
 for image_id, info in coco.imgs.items():
@@ -29,21 +29,22 @@ train_days = set()
 verify_days = set()
 
 for name, info in images.items():
-	train_label = f"{YOLO_TRAIN_LABEL_DIR}/{name}.txt"
-	verify_label = f"{YOLO_VERIFY_LABEL_DIR}/{name}.txt"
+	train_label = f"{DATASET_YOLO_TRAIN_LABEL_DIR}/{name}.txt"
+	verify_label = f"{DATASET_YOLO_VERIFY_LABEL_DIR}/{name}.txt"
 	is_train = exists(train_label)
 	is_verify = exists(verify_label)
 	assert is_train != is_verify, f"{name}: missing or duplicate label"
 
 	label_path = train_label if is_train else verify_label
-	image_dir = YOLO_TRAIN_IMAGE_DIR if is_train else YOLO_VERIFY_IMAGE_DIR
+	image_dir = DATASET_YOLO_TRAIN_IMAGE_DIR if is_train \
+		    else DATASET_YOLO_VERIFY_IMAGE_DIR
 	image_path = f"{image_dir}/{info['file_name']}"
 
 	days = train_days if is_train else verify_days
 	days.add(name[:CONFIG_OBSERVE_TEMPORAL_UNIT])
 
-	assert samefile(image_path, f"{TRAIN_IMAGE_DIR}/{info['file_name']}"), \
-	       name
+	assert samefile(image_path,
+			f"{MAGFILO_IMAGE_DIR}/{info['file_name']}"),  name
 
 	image = imread(image_path)
 	height, width = image.shape[:2]
@@ -78,8 +79,8 @@ for name, info in images.items():
 		max_error = max(max_error, error)
 		instance_count += 1
 
-label_count = len(glob(f"{YOLO_TRAIN_LABEL_DIR}/*.txt"))
-label_count += len(glob(f"{YOLO_VERIFY_LABEL_DIR}/*.txt"))
+label_count = len(glob(f"{DATASET_YOLO_TRAIN_LABEL_DIR}/*.txt"))
+label_count += len(glob(f"{DATASET_YOLO_VERIFY_LABEL_DIR}/*.txt"))
 
 assert label_count == len(images), 'unexpected extra label files'
 assert train_days.isdisjoint(verify_days), 'train/verify split leakage'

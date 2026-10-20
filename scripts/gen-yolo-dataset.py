@@ -19,19 +19,22 @@ images = {}
 train_days = set()
 verify_days = set()
 
-coco = COCO(TRAIN_METADATA)
+coco = COCO(MAGFILO_METADATA_FILE)
 rand = Random(CONFIG_FOLD_PRNG_SEED)
 metadata = None
 
-makedirs(YOLO_TRAIN_IMAGE_DIR)
-makedirs(YOLO_TRAIN_LABEL_DIR)
-makedirs(YOLO_VERIFY_IMAGE_DIR)
-makedirs(YOLO_VERIFY_LABEL_DIR)
+makedirs(DATASET_YOLO_TRAIN_IMAGE_DIR)
+makedirs(DATASET_YOLO_TRAIN_LABEL_DIR)
+makedirs(DATASET_YOLO_VERIFY_IMAGE_DIR)
+makedirs(DATASET_YOLO_VERIFY_LABEL_DIR)
 
-metadata = open(YOLO_METADATA, 'w')
+train_dir = DATASET_YOLO_TRAIN_IMAGE_DIR.removeprefix(f"{DATASET_YOLO_DIR}/")
+verify_dir = DATASET_YOLO_VERIFY_IMAGE_DIR.removeprefix(f"{DATASET_YOLO_DIR}/")
+
+metadata = open(DATASET_YOLO_METADATA, 'w')
 yaml_dump({
-	'train': YOLO_TRAIN_IMAGE_DIR.removeprefix(f"{YOLO_PREFIX}/"),
-	'val': YOLO_VERIFY_IMAGE_DIR.removeprefix(f"{YOLO_PREFIX}/"),
+	'train': train_dir,
+	'val': verify_dir,
 	'names': {
 		0: 'filament',
 	},
@@ -52,17 +55,17 @@ for day in train_days[:len(train_days) // CONFIG_NR_FOLDS]:
 
 for name, info in images.items():
 	filename = info['file_name']
-	image_prefix = YOLO_TRAIN_IMAGE_DIR
-	label_prefix = YOLO_TRAIN_LABEL_DIR
+	image_prefix = DATASET_YOLO_TRAIN_IMAGE_DIR
+	label_prefix = DATASET_YOLO_TRAIN_LABEL_DIR
 
 	label = None
 	annos = coco.imgToAnns[info['id']]
 
 	if name[:CONFIG_OBSERVE_TEMPORAL_UNIT] in verify_days:
-		image_prefix = YOLO_VERIFY_IMAGE_DIR
-		label_prefix = YOLO_VERIFY_LABEL_DIR
+		image_prefix = DATASET_YOLO_VERIFY_IMAGE_DIR
+		label_prefix = DATASET_YOLO_VERIFY_LABEL_DIR
 
-	link(f"{TRAIN_IMAGE_DIR}/{filename}", f"{image_prefix}/{filename}")
+	link(f"{MAGFILO_IMAGE_DIR}/{filename}", f"{image_prefix}/{filename}")
 	label = open(f"{label_prefix}/{name}.txt", 'w')
 
 	for anno in annos:

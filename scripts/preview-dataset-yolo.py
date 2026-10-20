@@ -13,6 +13,8 @@ from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
+prefix = f"{DATASET_PREVIEW_DIR}/yolo"
+
 fill_color = color_rgba_to_bgra(CONFIG_DRAW_SPINE_RGBA)
 fill_alpha = color_alpha_percent(fill_color)
 
@@ -25,16 +27,10 @@ label_alpha = color_alpha_percent(label_color)
 label_border_color = color_rgba_to_bgra(CONFIG_DRAW_TEXT_BORDER_RGBA)
 label_border_alpha = color_alpha_percent(label_border_color)
 
-def glob_and_sort(pattern):
-	files = glob(pattern)
-
-	files.sort()
-	return files
-
 def draw_image(task):
-	image_input, label_input, output = task
-	image = draw_load(image_input)
-	label = open(label_input)
+	image_src, label_src, dst = task
+	image = draw_load(image_src)
+	label = open(label_src)
 
 	for __idx, line in enumerate(label):
 		coords = coord_load_label_yolo(line)
@@ -55,20 +51,19 @@ def draw_image(task):
 		draw_text_border(overlay, bbox, idx, label_border_color)
 		image = draw_blend(image, overlay, label_border_alpha)
 
-	draw_dump(image, output)
+	draw_dump(image, dst)
 
 if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 
-	image_inputs = glob_and_sort(GLOB_YOLO_IMAGES)
-	label_inputs = glob_and_sort(GLOB_YOLO_LABELS)
+	image_srcs = path_glob_sorted(DATASET_YOLO_IMAGE_GLOB)
+	label_srcs = path_glob_sorted(DATASET_YOLO_LABEL_GLOB)
 
-	image_names = map(path_resolve_stem, image_inputs)
-	outputs = map(lambda name: f"{PREVIEW_YOLO_DIR}/{name}.png",
-		      image_names)
+	image_names = map(path_resolve_stem, image_srcs)
+	dsts = map(lambda name: f"{prefix}/{name}.png", image_names)
 
-	tasks = zip(image_inputs, label_inputs, outputs)
+	tasks = zip(image_srcs, label_srcs, dsts)
 
-	makedirs(PREVIEW_YOLO_DIR)
+	makedirs(prefix)
 	pool.map(draw_image, tasks)
