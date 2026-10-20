@@ -28,7 +28,7 @@ config IMAGE_DIMENSION
 
 config SUN_DISK_RADIUS
 	int "Solar disk radius in pixels"
-	depends on DROP_LIMB
-	default 900
+	depends on DROP_SUN_LIMB
+	default 894
 
 endmenu # Dataset parameters

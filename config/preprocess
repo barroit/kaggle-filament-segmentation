@@ -2,13 +2,17 @@
 
 menu "Data preprocessing"
 
-config DROP_LIMB
+config DROP_SUN_LIMB
 	bool "Erase the solar limb from input images"
 	default y
 
-config FIRST_ANNOTATOR_ONLY
-	bool "Use annotations from the first annotator (index 0) only"
-	default n
+config DROP_CORRUPT
+	bool "Drop corrupted annotations"
+	default y
+
+config DROP_OVERLAP
+	bool "Drop overlapping annotations"
+	default y
 
 config USE_FOLD
 	bool "Enable K-fold dataset partitioning"
