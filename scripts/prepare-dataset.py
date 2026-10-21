@@ -22,5 +22,8 @@ apply('format_metadata')
 if CONFIG_DROP_SUN_LIMB:
 	apply('drop_sun_limb')
 
+if CONFIG_DROP_DUPLICATED_ANNO:
+	apply('drop_duplicated_anno')
+
 if CONFIG_FILTER_ANNO:
 	apply('filter_anno')

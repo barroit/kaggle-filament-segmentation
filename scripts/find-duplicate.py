@@ -28,8 +28,8 @@ for id, annos in coco.imgToAnns.items():
 		print(f"{id}:")
 
 		for idx, anno in matches:
-			print(f"\tGT={idx + 1}: id={anno['id']}")
+			print(f"\tGT={idx + 1}:\tid={anno['id']}")
 
 		duplicates += 1
 
-print(f"Duplicate spine groups: {duplicates}")
+print(f"\nDuplicate spine groups: {duplicates}")

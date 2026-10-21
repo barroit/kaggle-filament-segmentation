@@ -6,7 +6,8 @@
    },
    "search.exclude": {
       "**/kconfiglib": true,
-      "**/dataset/preview/train/*": false,
+      "**/dataset/preview/train": false,
+      "**/magfilo/train/train_images": false,
    },
    "git.ignoredRepositories": [
       "kconfiglib",

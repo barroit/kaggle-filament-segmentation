@@ -22,12 +22,12 @@ if FILTER_ANNO
 		default 100
 endif # menuconfig FILTER_ANNO
 
-config DROP_CORRUPT
-	bool "Drop corrupted annotations"
+config DROP_DUPLICATED_ANNO
+	bool "Drop annotations with identical spines"
 	default y
 
-config DROP_OVERLAP
-	bool "Drop overlapping annotations"
+config DROP_OVERLAPPED_ANNO
+	bool "Drop annotations with overlapping polygons"
 	default y
 
 menuconfig USE_FOLD
