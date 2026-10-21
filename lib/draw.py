@@ -106,7 +106,7 @@ def draw_blend_label(image, xy, label):
 	draw_label_border(overlay, xy, label, label_border_color)
 	return draw_blend(image, overlay, label_alpha)
 
-def draw_blend_area(coords):
+def draw_blend_area(image, coords):
 	overlay = image.copy()
 
 	draw_fill_polygon(overlay, [coords], fill_color)
