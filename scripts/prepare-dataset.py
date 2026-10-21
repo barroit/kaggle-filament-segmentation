@@ -19,5 +19,8 @@ copytree(MAGFILO_IMAGE_DIR, DATASET_SHARED_IMAGE_DIR)
 apply('to_png')
 apply('format_metadata')
 
+if CONFIG_DROP_SUN_LIMB:
+	apply('drop_sun_limb')
+
 if CONFIG_FILTER_ANNO:
 	apply('filter_anno')
