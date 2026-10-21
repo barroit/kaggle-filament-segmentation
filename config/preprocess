@@ -15,10 +15,10 @@ menuconfig DROP_CONFLICTED_ANNO
 	default y
 
 if DROP_CONFLICTED_ANNO
-	config CONFLICT_IOU_THRESHOLD
-		int "Minimum inter-annotator IoU for conflict in percent"
+	config CONFLICT_COVERAGE_THRESHOLD
+		int "Minimum coverage to consider conflicting in precent"
 		range 0 100
-		default 28
+		default 90
 
 	config CONFLICT_WINNER_LENGTH_RATIO
 		int "Target winner-to-longest filament length ratio in percent"

@@ -13,7 +13,7 @@ from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
 
-conflict_iou_threshold = CONFIG_CONFLICT_IOU_THRESHOLD / 100
+conflict_coverage_threshold = CONFIG_CONFLICT_COVERAGE_THRESHOLD / 100
 winner_length_ratio = CONFIG_CONFLICT_WINNER_LENGTH_RATIO / 100
 
 def drop_conflicted_anno(task):
@@ -28,9 +28,9 @@ def drop_conflicted_anno(task):
 
 			mask_a = mask_from_coords(coords_a)
 			mask_b = mask_from_coords(coords_b)
-			iou = mask_calc_iou(mask_a, mask_b)
+			coverage = mask_calc_coverage(mask_a, mask_b)
 
-			if iou < conflict_iou_threshold:
+			if coverage < conflict_coverage_threshold:
 				continue
 
 			for seen in groups[:]:
