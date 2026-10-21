@@ -13,7 +13,7 @@ from lib.kconfig import *
 __all__ = [
 	'coord_load_bbox_coco',
 	'coord_load_label_yolo',
-	'coord_pack',
+	'coord_pack_int32',
 	'coord_pack_float64',
 	'coord_calc_bbox',
 	'coord_snap_bbox',
@@ -23,7 +23,7 @@ __all__ = [
 def coord_pack_float64(flatten):
 	return array(flatten, dtype=float64).reshape(-1, 2)
 
-def coord_pack(flatten):
+def coord_pack_int32(flatten):
 	coords_float = coord_pack_float64(flatten)
 
 	return rint(coords_float).astype(int32)
@@ -31,7 +31,7 @@ def coord_pack(flatten):
 def coord_load_bbox_coco(flatten):
 	x, y, width, height = flatten
 
-	return coord_pack([x, y, x + width, y + height])
+	return coord_pack_int32([x, y, x + width, y + height])
 
 def coord_load_label_yolo(line):
 	cols = line.split()

@@ -38,8 +38,8 @@ def draw(task):
 
 	for __idx, anno in enumerate(annos):
 		bbox = coord_load_bbox_coco(anno['bbox'])
-		spine = coord_pack(anno['spine'])
-		border = coord_pack(anno['segmentation'][0])
+		spine = coord_pack_int32(anno['spine'])
+		border = coord_pack_int32(anno['segmentation'][0])
 		idx = str(__idx + 1)
 		overlay = image.copy()
 
