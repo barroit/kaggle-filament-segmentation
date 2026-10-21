@@ -34,16 +34,20 @@ config DRAW_FONT_THICKNESS
 	int "Font thickness in pixels"
 	default 1
 
-config DRAW_TEXT_RGBA
+config DRAW_LABEL_RGBA
 	string "Text color in RGBA"
 	default "255 0 255 239"
 
-config DRAW_TEXT_BORDER_RGBA
+config DRAW_LABEL_BORDER_RGBA
 	string "Text border color in RGBA"
 	default "255 255 255 239"
 
-config DRAW_TEXT_BORDER_WIDTH
+config DRAW_LABEL_BORDER_WIDTH
 	int "Font border width in pixels"
 	default 1
+
+config DRAW_FILL_RGBA
+	string "Fill color in RGBA"
+	default "255 0 0 15"
 
 endmenu # Preview rendering settings
