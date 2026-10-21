@@ -55,7 +55,7 @@ def fetch_gt_shapes(file):
 
 		for line in label:
 			coords = coord_load_label_yolo(line)
-			bbox = coord_calc_bbox_yolo(coords)
+			bbox = coord_calc_bbox(coords)
 			mask = mask_from_coords(coords)
 
 			masks.append(mask)

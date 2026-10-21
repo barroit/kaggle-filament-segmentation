@@ -34,7 +34,7 @@ def draw_image(task):
 
 	for __idx, line in enumerate(label):
 		coords = coord_load_label_yolo(line)
-		bbox = coord_calc_bbox_yolo(coords)
+		bbox = coord_calc_bbox(coords)
 		overlay = image.copy()
 		idx = str(__idx + 1)
 

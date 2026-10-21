@@ -11,11 +11,11 @@ from numpy import array, float64, int32, rint
 from lib.kconfig import *
 
 __all__ = [
-	'coord_calc_bbox_yolo',
 	'coord_load_bbox_coco',
 	'coord_load_label_yolo',
 	'coord_pack',
 	'coord_pack_float64',
+	'coord_calc_bbox',
 	'coord_snap_bbox',
 	'coord_calc_bbox_intersection',
 ]
@@ -39,7 +39,7 @@ def coord_load_label_yolo(line):
 
 	return rint(scale * CONFIG_IMAGE_DIMENSION).astype(int32)
 
-def coord_calc_bbox_yolo(coords):
+def coord_calc_bbox(coords):
 	x, y, width, height = bounding_rect(coords)
 
 	return (x, y, x + width, y + height)
