@@ -26,6 +26,7 @@ def format_anno(__anno, image, author):
 	anno['spine'] = __anno['spine']
 	anno['polygon'] =  __anno['segmentation'][0]
 	anno['bbox'] = __anno['bbox']
+	anno['area'] = __anno['area']
 
 	return anno
 
