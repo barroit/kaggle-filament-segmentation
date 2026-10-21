@@ -26,9 +26,16 @@ if DROP_CONFLICTED_ANNO
 		default 100
 endif # menuconfig DROP_CONFLICTED_ANNO
 
-config DROP_OVERLAPPED_ANNO
+menuconfig DROP_OVERLAPPED_ANNO
 	bool "Drop annotations with overlapping polygons"
 	default y
+
+if DROP_OVERLAPPED_ANNO
+	config OVERLAP_DROP_THRESHOLD
+		int "Minimum IoU for dropping overlapping annotations in percent"
+		range 0 100
+		default 5
+endif # menuconfig DROP_OVERLAPPED_ANNO
 
 menuconfig USE_FOLD
 	bool "Enable K-fold dataset partitioning"

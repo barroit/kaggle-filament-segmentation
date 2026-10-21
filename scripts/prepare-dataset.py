@@ -27,3 +27,6 @@ if CONFIG_DROP_DUPLICATED_ANNO:
 
 if CONFIG_DROP_CONFLICTED_ANNO:
 	apply('drop_conflicted_anno')
+
+if CONFIG_DROP_OVERLAPPED_ANNO:
+	apply('drop_overlapped_anno')
