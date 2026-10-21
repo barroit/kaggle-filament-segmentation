@@ -24,7 +24,7 @@ def format_anno(__anno, image, author):
 	anno['cat'] = __anno['category_id']
 	anno['image'] = image
 	anno['spine'] = __anno['spine']
-	anno['polygon'] =  __anno['segmentation']
+	anno['polygon'] =  __anno['segmentation'][0]
 	anno['bbox'] = __anno['bbox']
 
 	return anno
