@@ -6,6 +6,7 @@
    },
    "search.exclude": {
       "**/kconfiglib": true,
+      "**/dataset/preview/train/*": false,
    },
    "git.ignoredRepositories": [
       "kconfiglib",

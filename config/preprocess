@@ -14,14 +14,11 @@ config DROP_OVERLAP
 	bool "Drop overlapping annotations"
 	default y
 
-config USE_FOLD
+menuconfig USE_FOLD
 	bool "Enable K-fold dataset partitioning"
 	default y
 
-endmenu # Data preprocessing configuration
-
-menu "K-fold partitioning"
-	depends on USE_FOLD
+if USE_FOLD
 
 config NR_FOLDS
 	int "Number of folds (K)"
@@ -52,4 +49,6 @@ config OBSERVE_TEMPORAL_UNIT
 	default 10 if OBSERVE_TEMPORAL_UNIT_HOUR
 	default 12 if OBSERVE_TEMPORAL_UNIT_MINUTE
 
-endmenu # K-fold partitioning configuration
+endif # menuconfig USE_FOLD
+
+endmenu # Data preprocessing configuration
