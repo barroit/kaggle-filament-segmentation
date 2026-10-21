@@ -6,11 +6,15 @@ config DROP_SUN_LIMB
 	bool "Erase the solar limb from input images"
 	default y
 
-menuconfig FILTER_ANNO
+config DROP_DUPLICATED_ANNO
+	bool "Drop annotations with identical spines"
+	default y
+
+menuconfig DROP_CONFLICTED_ANNO
 	bool "Drop conflicting annotations across annotators"
 	default y
 
-if FILTER_ANNO
+if DROP_CONFLICTED_ANNO
 	config CONFLICT_IOU_THRESHOLD
 		int "Minimum inter-annotator IoU for conflict in percent"
 		range 0 100
@@ -20,11 +24,7 @@ if FILTER_ANNO
 		int "Target winner-to-longest filament length ratio in percent"
 		range 0 100
 		default 100
-endif # menuconfig FILTER_ANNO
-
-config DROP_DUPLICATED_ANNO
-	bool "Drop annotations with identical spines"
-	default y
+endif # menuconfig DROP_CONFLICTED_ANNO
 
 config DROP_OVERLAPPED_ANNO
 	bool "Drop annotations with overlapping polygons"

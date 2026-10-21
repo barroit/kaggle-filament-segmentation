@@ -25,5 +25,5 @@ if CONFIG_DROP_SUN_LIMB:
 if CONFIG_DROP_DUPLICATED_ANNO:
 	apply('drop_duplicated_anno')
 
-if CONFIG_FILTER_ANNO:
-	apply('filter_anno')
+if CONFIG_DROP_CONFLICTED_ANNO:
+	apply('drop_conflicted_anno')

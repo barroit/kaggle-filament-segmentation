@@ -16,7 +16,7 @@ from lib.path import *
 conflict_iou_threshold = CONFIG_CONFLICT_IOU_THRESHOLD / 100
 winner_length_ratio = CONFIG_CONFLICT_WINNER_LENGTH_RATIO / 100
 
-def filter_anno(task):
+def drop_conflicted_anno(task):
 	name, annos = task
 	groups = []
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 	dst = open(DATASET_SHARED_METADATA, 'w+')
 
 	tasks = metadata.items()
-	results = pool.map(filter_anno, tasks)
+	results = pool.map(drop_conflicted_anno, tasks)
 
 	metadata = dict(results)
 	json_dump(metadata, dst, separators=(',', ':'))
