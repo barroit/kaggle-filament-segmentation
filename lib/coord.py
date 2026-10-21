@@ -6,7 +6,7 @@
 from math import ceil, floor
 
 from cv2 import boundingRect as bounding_rect
-from numpy import array, float64, int32, rint
+from numpy import array, diff, float64, hypot, int32, rint
 
 from lib.kconfig import *
 
@@ -18,6 +18,7 @@ __all__ = [
 	'coord_calc_bbox',
 	'coord_snap_bbox',
 	'coord_calc_bbox_intersection',
+	'coord_calc_spine_length',
 ]
 
 def coord_pack_float64(flatten):
@@ -63,3 +64,8 @@ def coord_calc_bbox_intersection(bbox_a, bbox_b):
 	intersection = width * height
 
 	return intersection
+
+def coord_calc_spine_length(coords):
+	delta = diff(coords, axis=0)
+
+	return hypot(delta[:, 0], delta[:, 1]).sum()

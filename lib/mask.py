@@ -9,8 +9,8 @@ from numpy import count_nonzero, uint8, zeros
 from lib.kconfig import *
 
 __all__ = [
-	'mask_calc_iou',
 	'mask_from_coords',
+	'mask_calc_iou',
 ]
 
 def mask_from_coords(coords):
