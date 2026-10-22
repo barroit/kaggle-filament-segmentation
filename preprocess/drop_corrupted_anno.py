@@ -27,6 +27,7 @@ bad = (
 	# There are also some poor quality annotations with overly aggressive
 	# polygons.
 	'f8e08c38-d36a-4d75-aa83-e328a2f4e873',
+	'2309b8f3-ea38-4a0e-931c-a657433c391a',
 )
 
 src = open(DATASET_SHARED_METADATA)
