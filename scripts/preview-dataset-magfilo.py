@@ -13,7 +13,7 @@ from lib.coord import *
 from lib.draw import *
 from lib.path import *
 
-prefix = 'preview/train'
+prefix = 'preview/magfilo'
 
 def draw(task):
 	src, dst, annos = task
