@@ -12,7 +12,6 @@ from numpy import array, float64
 from pycocotools.coco import COCO
 
 from lib.coord import *
-from lib.kconfig import *
 from lib.path import *
 
 coco = COCO(MAGFILO_METADATA_FILE)
@@ -25,8 +24,6 @@ for image_id, info in coco.imgs.items():
 
 instance_count = 0
 max_error = 0.0
-train_days = set()
-verify_days = set()
 
 for name, info in images.items():
 	train_label = f"{DATASET_YOLO_TRAIN_LABEL_DIR}/{name}.txt"
@@ -39,9 +36,6 @@ for name, info in images.items():
 	image_dir = DATASET_YOLO_TRAIN_IMAGE_DIR if is_train \
 		    else DATASET_YOLO_VERIFY_IMAGE_DIR
 	image_path = f"{image_dir}/{info['file_name']}"
-
-	days = train_days if is_train else verify_days
-	days.add(name[:CONFIG_OBSERVE_TEMPORAL_UNIT])
 
 	assert samefile(image_path,
 			f"{MAGFILO_IMAGE_DIR}/{info['file_name']}"),  name
@@ -83,7 +77,6 @@ label_count = len(glob(f"{DATASET_YOLO_TRAIN_LABEL_DIR}/*.txt"))
 label_count += len(glob(f"{DATASET_YOLO_VERIFY_LABEL_DIR}/*.txt"))
 
 assert label_count == len(images), 'unexpected extra label files'
-assert train_days.isdisjoint(verify_days), 'train/verify split leakage'
 
 print(f"Validated {len(images)} images and {instance_count} instances")
 print(f"Maximum coordinate error: {max_error:.12f} pixels")

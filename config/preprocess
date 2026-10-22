@@ -37,41 +37,4 @@ if DROP_OVERLAPPED_ANNO
 		default 5
 endif # menuconfig DROP_OVERLAPPED_ANNO
 
-menuconfig USE_FOLD
-	bool "Enable K-fold dataset partitioning"
-	default y
-
-if USE_FOLD
-
-config NR_FOLDS
-	int "Number of folds (K)"
-	default 5
-
-config FOLD_PRNG_SEED
-	int "PRNG seed for fold shuffling"
-	default 39
-
-choice
-	prompt "Temporal grouping granularity"
-	default OBSERVE_TEMPORAL_UNIT_DATE
-
-config OBSERVE_TEMPORAL_UNIT_DATE
-	bool "By date (YYYYMMDD)"
-
-config OBSERVE_TEMPORAL_UNIT_HOUR
-	bool "By hour (YYYYMMDDHH)"
-
-config OBSERVE_TEMPORAL_UNIT_MINUTE
-	bool "By minute (YYYYMMDDHHMM)"
-
-endchoice
-
-config OBSERVE_TEMPORAL_UNIT
-	int
-	default 8 if OBSERVE_TEMPORAL_UNIT_DATE
-	default 10 if OBSERVE_TEMPORAL_UNIT_HOUR
-	default 12 if OBSERVE_TEMPORAL_UNIT_MINUTE
-
-endif # menuconfig USE_FOLD
-
 endmenu # Data preprocessing configuration
