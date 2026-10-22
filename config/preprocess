@@ -18,7 +18,7 @@ if DROP_CONFLICTED_ANNO
 	config CONFLICT_COVERAGE_THRESHOLD
 		int "Minimum coverage to consider conflicting in precent"
 		range 0 100
-		default 75
+		default 55
 
 	config CONFLICT_WINNER_LENGTH_RATIO
 		int "Target winner-to-longest filament length ratio in percent"
