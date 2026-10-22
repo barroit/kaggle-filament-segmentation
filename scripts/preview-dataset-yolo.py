@@ -13,7 +13,7 @@ from lib.draw import *
 from lib.kconfig import *
 from lib.path import *
 
-prefix = f"{DATASET_PREVIEW_DIR}/yolo"
+prefix = 'preview/yolo'
 
 def draw_image(task):
 	image_src, label_src, dst = task

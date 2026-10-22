@@ -13,7 +13,7 @@ from lib.coord import *
 from lib.draw import *
 from lib.path import *
 
-prefix = f"{DATASET_PREVIEW_DIR}/train"
+prefix = 'preview/train'
 
 def draw(task):
 	src, dst, annos = task

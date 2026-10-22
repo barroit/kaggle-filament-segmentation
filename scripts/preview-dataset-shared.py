@@ -15,8 +15,8 @@ from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
 
-prefix = f"{DATASET_PREVIEW_DIR}/shared"
-overlap_prefix = f"{DATASET_PREVIEW_DIR}/shared/overlap"
+prefix = 'preview/shared'
+overlap_prefix = 'preview/shared/overlap'
 
 def draw(task):
 	name, annos = task
