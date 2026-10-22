@@ -2,7 +2,7 @@
 #
 # Copyright 2026 Jiamu Sun <39@barroit.sh>
 #
-# Duplications are discovered by scripts/find-duplicate.py.
+# Corrupted annotations were identified using scripts/find-duplicate.py.
 #
 # 010403-20160810234034Lh:
 # 	GT=1:	id=d38060a1-d7c7-459a-8048-abeb4d6fa7c4	(bad)

@@ -6,8 +6,8 @@ config DROP_SUN_LIMB
 	bool "Erase the solar limb from input images"
 	default y
 
-config DROP_DUPLICATED_ANNO
-	bool "Drop annotations with identical spines"
+config DROP_CORRUPTED_ANNO
+	bool "Drop corrupted annotations"
 	default y
 
 menuconfig DROP_CONFLICTED_ANNO
