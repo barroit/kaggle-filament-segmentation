@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "Data preprocessing"
+menu "Data Preprocessing"
 
 config DROP_SUN_LIMB
 	bool "Drop solar limb"
@@ -58,4 +58,14 @@ config ANNO_OVERLAP_THRESHOLD
 
 endif # menuconfig DROP_OVERLAPPED_ANNO
 
-endmenu # Data preprocessing
+menu "Dataset Splitting"
+
+config OBSERVE_PERIOD
+	int "Observation period duration"
+	default 7
+	help
+	  Number of calendar days in each observation period.
+
+endmenu # Dataset Splitting
+
+endmenu # Data Preprocessing

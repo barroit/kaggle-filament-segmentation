@@ -30,3 +30,5 @@ if CONFIG_DROP_CONFLICTED_ANNO:
 
 if CONFIG_DROP_OVERLAPPED_ANNO:
 	apply('drop_overlapped_anno')
+
+apply('partition_period')
