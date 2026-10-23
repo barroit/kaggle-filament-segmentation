@@ -36,12 +36,12 @@ if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = alloc_pool(cpus)
 
-	src = open(DATASET_SHARED_METADATA)
-	metadata = json_load(src)
-	dst = open(DATASET_SHARED_METADATA, 'w+')
+	src = open(DATASET_SHARED_ANNOTATIONS)
+	annotations = json_load(src)
+	dst = open(DATASET_SHARED_ANNOTATIONS, 'w+')
 
-	tasks = metadata.items()
+	tasks = annotations.items()
 	results = pool.map(drop_overlapped_anno, tasks)
 
-	metadata = dict(results)
-	json_dump(metadata, dst, separators=(',', ':'))
+	annotations = dict(results)
+	json_dump(annotations, dst, separators=(',', ':'))

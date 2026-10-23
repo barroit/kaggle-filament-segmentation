@@ -77,9 +77,9 @@ if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = alloc_pool(cpus)
 
-	src = open(DATASET_SHARED_METADATA)
-	metadata = json_load(src)
-	tasks = metadata.items()
+	src = open(DATASET_SHARED_ANNOTATIONS)
+	annotations = json_load(src)
+	tasks = annotations.items()
 
 	makedirs(prefix)
 	makedirs(overlap_prefix)

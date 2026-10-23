@@ -30,13 +30,13 @@ bad = (
 	'2309b8f3-ea38-4a0e-931c-a657433c391a',
 )
 
-src = open(DATASET_SHARED_METADATA)
-metadata = json_load(src)
-dst = open(DATASET_SHARED_METADATA, 'w+')
+src = open(DATASET_SHARED_ANNOTATIONS)
+annotations = json_load(src)
+dst = open(DATASET_SHARED_ANNOTATIONS, 'w+')
 
-for annos in metadata.values():
+for annos in annotations.values():
 	for anno in annos[:]:
 		if anno['id'] in bad:
 			annos.remove(anno)
 
-json_dump(metadata, dst, separators=(',', ':'))
+json_dump(annotations, dst, separators=(',', ':'))

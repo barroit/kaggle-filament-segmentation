@@ -12,9 +12,9 @@ from pycocotools.coco import COCO as alloc_coco
 from lib.path import *
 
 coco = alloc_coco(MAGFILO_METADATA_FILE)
-dst = open(DATASET_SHARED_METADATA, 'w')
+dst = open(DATASET_SHARED_ANNOTATIONS, 'w')
 
-metadata = defaultdict(list)
+annotations = defaultdict(list)
 
 def format_anno(__anno, image, author):
 	anno = dict()
@@ -38,6 +38,6 @@ for image in coco.imgs.values():
 	annos = map(format_anno, coco.imgToAnns[id], repeat(name),
 		    repeat(author))
 
-	metadata[name].extend(annos)
+	annotations[name].extend(annos)
 
-json_dump(metadata, dst, separators=(',', ':'))
+json_dump(annotations, dst, separators=(',', ':'))

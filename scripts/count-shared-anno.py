@@ -9,7 +9,7 @@ from json import load as json_load
 
 from lib.path import *
 
-src = open(DATASET_SHARED_METADATA)
+src = open(DATASET_SHARED_ANNOTATIONS)
 metadata = json_load(src)
 
 annos_list = metadata.values()
