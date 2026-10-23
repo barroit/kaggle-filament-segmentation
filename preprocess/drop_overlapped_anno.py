@@ -12,8 +12,6 @@ from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
 
-drop_threshold = CONFIG_OVERLAP_DROP_THRESHOLD / 100
-
 def drop_overlapped_anno(task):
 	name, annos = task
 
@@ -25,8 +23,8 @@ def drop_overlapped_anno(task):
 		mask_b = mask_from_coords(coords_b)
 		iou = mask_calc_iou(mask_a, mask_b)
 
-		if iou >= drop_threshold and anno_a in annos and \
-		   anno_b in annos:
+		if iou * 100 >= CONFIG_ANNO_OVERLAP_THRESHOLD and \
+		   anno_a in annos and anno_b in annos:
 			if anno_a['area'] > anno_b['area']:
 				annos.remove(anno_b)
 			else:

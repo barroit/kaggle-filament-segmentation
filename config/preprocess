@@ -3,38 +3,59 @@
 menu "Data preprocessing"
 
 config DROP_SUN_LIMB
-	bool "Erase the solar limb from input images"
+	bool "Drop solar limb"
 	default y
+	help
+	  Enable this to erase the solar limb from input images
 
 config DROP_CORRUPTED_ANNO
 	bool "Drop corrupted annotations"
 	default y
+	help
+	  Enable this to drop corrupted annotations.
 
 menuconfig DROP_CONFLICTED_ANNO
-	bool "Drop conflicting annotations across annotators"
+	bool "Drop conflicting annotations"
 	default y
+	help
+	  Enable this to drop conflicting annotations from different annotators.
 
 if DROP_CONFLICTED_ANNO
-	config CONFLICT_COVERAGE_THRESHOLD
-		int "Minimum coverage to consider conflicting in precent"
-		range 0 100
-		default 55
 
-	config CONFLICT_WINNER_LENGTH_RATIO
-		int "Target winner-to-longest filament length ratio in percent"
-		range 0 100
-		default 100
+config ANNO_CONFLICT_THRESHOLD
+	int "Annotation conflicting threshold"
+	range 0 100
+	default 55
+	help
+	  Annotations are considered conflicting when one covers more than this
+	  percentage of another.
+
+config ANNO_CONFLICT_WINNER_RATIO
+	int "Annotation conflicting winner ratio"
+	range 0 100
+	default 100
+	help
+	  When annotations conflict, retain the annotation whose length ratio to
+	  the longest annotation is closest to this value.
+
 endif # menuconfig DROP_CONFLICTED_ANNO
 
 menuconfig DROP_OVERLAPPED_ANNO
-	bool "Drop annotations with overlapping polygons"
+	bool "Drop overlapping annotations"
 	default y
+	help
+	  Enable this to drop annotations with overlapping polygons.
 
 if DROP_OVERLAPPED_ANNO
-	config OVERLAP_DROP_THRESHOLD
-		int "Minimum IoU for dropping overlapping annotations in percent"
-		range 0 100
-		default 5
+
+config ANNO_OVERLAP_THRESHOLD
+	int "Annotation overlapping threshold"
+	range 0 100
+	default 5
+	help
+	  Annotations are considered overlapping when their polygon IoU exceeds
+	  this threshold.
+
 endif # menuconfig DROP_OVERLAPPED_ANNO
 
-endmenu # Data preprocessing configuration
+endmenu # Data preprocessing
