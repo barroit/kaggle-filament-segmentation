@@ -17,7 +17,7 @@ def apply(name):
 copytree(MAGFILO_IMAGE_DIR, DATASET_SHARED_IMAGE_DIR)
 
 apply('to_png')
-apply('format_metadata')
+apply('format_anno')
 
 if CONFIG_DROP_SUN_LIMB:
 	apply('drop_sun_limb')
