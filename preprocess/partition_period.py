@@ -25,23 +25,25 @@ start = datetime.strptime(days[0][0], '%Y%m%d')
 
 periods.append({
 	'idx': 0,
-	'annos': 0,
+	'annos': [],
 	'images': [],
 })
 
 for date, name in days:
 	current = datetime.strptime(date, '%Y%m%d')
 	span = current - start
+
 	idx = span.days // CONFIG_OBSERVE_PERIOD
+	annos = len(annotations[name])
 
 	if periods[-1]['idx'] != idx:
 		periods.append({
 			'idx': idx,
-			'annos': 0,
+			'annos': [],
 			'images': [],
 		})
 
-	periods[-1]['annos'] += len(annotations[name])
+	periods[-1]['annos'].append(annos)
 	periods[-1]['images'].append(name)
 
 json_dump(periods, dst, separators=(',', ':'))
