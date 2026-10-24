@@ -66,6 +66,13 @@ config OBSERVE_PERIOD
 	help
 	  Number of calendar days in each observation period.
 
+config SPLIT_TEMPORAL_GAP
+	int "Minimum cross-dataset temporal gap"
+	default 3
+	help
+	  Minimum number of excluded calendar days at boundaries between
+	  observation periods assigned to different dataset splits.
+
 config SPLIT_PRNG_SEED
 	int "Dataset splitting PRNG seed"
 	default 39

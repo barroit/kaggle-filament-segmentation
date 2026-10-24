@@ -33,3 +33,4 @@ if CONFIG_DROP_OVERLAPPED_ANNO:
 
 apply('partition_period')
 apply('assign_dataset')
+apply('enforce_set_gap')
