@@ -3,9 +3,9 @@
 # Copyright 2026 Jiamu Sun <39@barroit.sh>
 #
 
-from datetime import datetime
 from json import dump as json_dump, load as json_load
 
+from lib.date import *
 from lib.kconfig import *
 from lib.path import *
 
@@ -21,7 +21,7 @@ for name in annotations:
 	days.append((name[:8], name))
 
 days.sort(key=lambda item: item[0])
-start = datetime.strptime(days[0][0], '%Y%m%d')
+start = date_from_str(days[0][0])
 
 periods.append({
 	'idx': 0,
@@ -30,7 +30,7 @@ periods.append({
 })
 
 for date, name in days:
-	current = datetime.strptime(date, '%Y%m%d')
+	current = date_from_str(date)
 	span = current - start
 
 	idx = span.days // CONFIG_OBSERVE_PERIOD

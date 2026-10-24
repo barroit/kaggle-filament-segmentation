@@ -66,6 +66,34 @@ config OBSERVE_PERIOD
 	help
 	  Number of calendar days in each observation period.
 
+config SPLIT_PRNG_SEED
+	int "Dataset splitting PRNG seed"
+	default 39
+	help
+	  Seed for reproducible random assignment of observation periods to
+	  dataset splits.
+
+config TRAIN_SET_PROPORTION
+	int "Training set proportion"
+	range 0 100
+	default 56
+	help
+	  Target proportion of annotations assigned to the training set.
+
+config VALIDATE_SET_PROPORTION
+	int "Validation set proportion"
+	range 0 100
+	default 14
+	help
+	  Target proportion of annotations assigned to the validation set.
+
+config TEST_SET_PROPORTION
+	int "Test set proportion"
+	range 0 100
+	default 30
+	help
+	  Target proportion of annotations assigned to the test set.
+
 endmenu # Dataset Splitting
 
 endmenu # Data Preprocessing
