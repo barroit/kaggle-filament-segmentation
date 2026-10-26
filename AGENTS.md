@@ -12,3 +12,5 @@ Make the smallest possible change to the existing code:
 - Prefer simple, direct conditions over refactoring or alternative algorithms.
 - Preserve the existing structure and control flow as much as possible.
 - Do not introduce additional loops, comprehensions, data structures, or helper functions if they are not strictly required.
+
+Don't close any file streams.
