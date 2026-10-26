@@ -39,8 +39,8 @@ dr_count = 0
 pred_count = 0
 
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
-stream = model.predict(source=TRAIN_IMAGE_DIR, stream=True, save=False,
-		       verbose=False, retina_masks=True, device=0,
+stream = model.predict(source=f"{DATASET_YOLO_DIR}/test/images", stream=True,
+		       save=False, verbose=False, retina_masks=True, device=0,
 		       batch=CONFIG_YOLO_PRED_BATCH)
 
 summary_plot = subplots(2, 4, figsize=(25.6, 12.8))
@@ -156,7 +156,7 @@ def produce_gt_coverages():
 	plot_fig.savefig(f"{prefix}/gt_coverage_confidence.png")
 	close(plot_fig)
 
-	csv.writerow(('image', 'x1', 'x1', 'x2', 'y2', 'gt_coverage',
+	csv.writerow(('image', 'x1', 'y1', 'x2', 'y2', 'gt_coverage',
 		     'confidence'))
 
 	for gt_coverage in gt_coverages:
@@ -279,7 +279,7 @@ def produce_detection_precision():
 
 makedirs(prefix)
 
-for path in glob(DATASET_YOLO_LABEL_GLOB):
+for path in glob(f"{DATASET_YOLO_DIR}/test/labels/*.txt"):
 	name = path_resolve_stem(path)
 
 	label_inputs[name] = path
