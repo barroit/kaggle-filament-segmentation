@@ -10,7 +10,7 @@ from pycocotools.coco import COCO
 
 from lib.path import *
 
-coco = COCO(MAGFILO_METADATA_FILE)
+coco = COCO(MAGFILO_METADATA)
 duplicates = 0
 
 for id, annos in coco.imgToAnns.items():

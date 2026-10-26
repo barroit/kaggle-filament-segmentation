@@ -36,7 +36,7 @@ if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = Pool(cpus)
 
-	coco = COCO(MAGFILO_METADATA_FILE)
+	coco = COCO(MAGFILO_METADATA)
 	ids = coco.getImgIds()
 	tasks = []
 

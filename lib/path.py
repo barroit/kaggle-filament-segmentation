@@ -9,7 +9,7 @@ from os.path import basename, splitext
 from lib.kconfig import *
 
 __all__ = [
-	'MAGFILO_METADATA_FILE',
+	'MAGFILO_METADATA',
 	'MAGFILO_IMAGE_DIR',
 
 	'DATASET_SHARED_DIR',
@@ -33,7 +33,7 @@ __all__ = [
 	'path_replace_suffix',
 ]
 
-MAGFILO_METADATA_FILE = f"{CONFIG_MAGFILO_DIR}/MAGFiLO_1.0_Annotations_kaggle2026_train.json"
+MAGFILO_METADATA = f"{CONFIG_MAGFILO_DIR}/MAGFiLO_1.0_Annotations_kaggle2026_train.json"
 MAGFILO_IMAGE_DIR = f"{CONFIG_MAGFILO_DIR}/train_images"
 
 DATASET_SHARED_DIR = f"{CONFIG_DATASET_DIR}/shared"

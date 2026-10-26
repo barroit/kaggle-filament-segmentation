@@ -11,7 +11,7 @@ from pycocotools.coco import COCO as alloc_coco
 
 from lib.path import *
 
-coco = alloc_coco(MAGFILO_METADATA_FILE)
+coco = alloc_coco(MAGFILO_METADATA)
 dst = open(DATASET_SHARED_ANNOTATIONS, 'w')
 
 annotations = defaultdict(list)

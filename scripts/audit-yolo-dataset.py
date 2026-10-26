@@ -14,7 +14,7 @@ from pycocotools.coco import COCO
 from lib.coord import *
 from lib.path import *
 
-coco = COCO(MAGFILO_METADATA_FILE)
+coco = COCO(MAGFILO_METADATA)
 images = {}
 
 for image_id, info in coco.imgs.items():
