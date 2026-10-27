@@ -6,12 +6,13 @@
 
 from csv import writer
 from glob import glob
+from json import load as json_load
 from os import makedirs
 from sys import argv
 from types import SimpleNamespace as simple_namespace
 
 from matplotlib.pyplot import close, subplots
-from numpy import count_nonzero
+from numpy import count_nonzero, linspace, quantile, searchsorted
 from ultralytics import YOLO as yolo
 
 from lib.coord import *
@@ -20,6 +21,9 @@ from lib.mask import *
 from lib.path import *
 
 prefix = f"{CONFIG_EVALUATION_DIR}/{argv[1]}"
+
+annotations_src = open(DATASET_SHARED_ANNOTATIONS)
+annotations = json_load(annotations_src)
 
 label_inputs = dict()
 gt_shapes = dict()
@@ -33,14 +37,18 @@ cr_count = 0
 dr_count = 0
 pred_count = 0
 
+spine_lengths = list()
+spine_detected = list()
+
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=f"{DATASET_YOLO_DIR}/test/images", stream=True,
 		       save=False, verbose=False, retina_masks=True, device=0,
 		       batch=CONFIG_YOLO_PRED_BATCH)
 
-summary_plot = subplots(2, 4, figsize=(25.6, 12.8))
+summary_plot = subplots(2, 5, figsize=(32, 12.8))
 summary_fig = summary_plot[0]
-summary_axes = iter(summary_plot[1].flat[[0, 4, 2, 1, 5, 3, 7, 6]])
+summary_layout = [0, 5, 2, 1, 6, 3, 8, 4, 7, 9]
+summary_axes = iter(summary_plot[1].flat[summary_layout])
 
 def fetch_gt_shapes(file):
 	if file not in gt_shapes:
@@ -120,6 +128,28 @@ def eval_crop_efficiencies(ctx):
 		crop_efficiencies.append((ctx.name, *ctx.pred_bboxes[pred_idx],
 					 efficiency, ctx.pred_confs[pred_idx]))
 
+def eval_detection_recall(ctx):
+	global dr_count
+
+	dr_count += ctx.tp_count
+
+def eval_detection_precision(ctx):
+	pass
+
+def eval_detection_recall_by_spine_length(ctx):
+	matched = set()
+	annos = annotations[ctx.name]
+
+	for _, idx in ctx.tp_pairs:
+		matched.add(idx)
+
+	for idx, anno in enumerate(annos):
+		coords = coord_pack_float64(anno['spine'])
+		length = coord_calc_spine_length(coords)
+
+		spine_lengths.append(length)
+		spine_detected.append(idx in matched)
+
 def produce_gt_coverages():
 	*_, covs, confs = zip(*gt_coverages)
 
@@ -156,14 +186,6 @@ def produce_gt_coverages():
 
 	for gt_coverage in gt_coverages:
 		csv.writerow(gt_coverage)
-
-def eval_detection_recall(ctx):
-	global dr_count
-
-	dr_count += ctx.tp_count
-
-def eval_detection_precision(ctx):
-	pass
 
 def produce_crop_recall():
 	recall = cr_count / gt_count
@@ -273,6 +295,53 @@ def produce_detection_precision():
 	csv.writerow(('tp_count', 'pred_count', 'precision'))
 	csv.writerow((dr_count, pred_count, precision))
 
+def produce_detection_recall_by_spine_length():
+	gt_counts = [0] * CONFIG_YOLO_SPINE_BINS
+	tp_counts = [0] * CONFIG_YOLO_SPINE_BINS
+	recalls = list()
+
+	quantiles = linspace(0, 1, CONFIG_YOLO_SPINE_BINS + 1)
+	edges = quantile(spine_lengths, quantiles)
+	bins = range(1, CONFIG_YOLO_SPINE_BINS + 1)
+
+	__csv = open(f"{prefix}/detection_recall_by_spine_length.csv", 'w',
+		     newline='')
+	csv = writer(__csv)
+
+	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
+
+	edges[-1] += 1
+
+	for length, detected in zip(spine_lengths, spine_detected):
+		idx = searchsorted(edges[1:-1], length, side='right')
+
+		gt_counts[idx] += 1
+		tp_counts[idx] += detected
+
+	csv.writerow(('bin', 'length_min', 'length_max', 'gt_count', 'tp_count',
+		     'recall'))
+
+	for idx in range(CONFIG_YOLO_SPINE_BINS):
+		recall = None
+
+		if gt_counts[idx]:
+			recall = tp_counts[idx] / gt_counts[idx]
+			csv.writerow((idx + 1, edges[idx], edges[idx + 1],
+				     gt_counts[idx], tp_counts[idx], recall))
+
+		recalls.append(recall)
+
+	for axis in (plot_axis, next(summary_axes)):
+		axis.plot(bins, recalls, marker='o')
+		axis.set_xticks(bins)
+		axis.set_xlabel('Spine Length Quantile')
+		axis.set_ylabel('Detection Recall')
+		axis.set_ylim(0, 1)
+
+	plot_fig.tight_layout()
+	plot_fig.savefig(f"{prefix}/detection_recall_by_spine_length.png")
+	close(plot_fig)
+
 makedirs(prefix)
 
 for path in glob(f"{DATASET_YOLO_DIR}/test/labels/*.txt"):
@@ -304,12 +373,14 @@ for result in stream:
 	eval_crop_efficiencies(ctx)
 	eval_detection_recall(ctx)
 	eval_detection_precision(ctx)
+	eval_detection_recall_by_spine_length(ctx)
 
 produce_gt_coverages()
 produce_crop_recall()
 produce_crop_efficiencies()
 produce_detection_recall()
 produce_detection_precision()
+produce_detection_recall_by_spine_length()
 
 for axis in summary_axes:
 	summary_fig.delaxes(axis)

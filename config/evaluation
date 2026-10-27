@@ -24,4 +24,10 @@ config YOLO_CROP_RECALL_THRESHOLD
 	  Minimum percentage of a ground-truth filament covered by a
 	  true-positive crop to contribute to crop recall.
 
+config YOLO_SPINE_BINS
+	int "Number of spine length bins"
+	default 5
+	help
+	  Number of quantile bins used to group filaments by spine length.
+
 endmenu # YOLO Evaluation
