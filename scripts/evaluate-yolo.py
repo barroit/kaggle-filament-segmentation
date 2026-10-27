@@ -153,8 +153,8 @@ def eval_detection_recall_by_spine_length(ctx):
 def produce_gt_coverages():
 	*_, covs, confs = zip(*gt_coverages)
 
-	__csv = open(f"{prefix}/gt_coverage.csv", 'w', newline='')
-	csv = writer(__csv)
+	csv_dst = open(f"{prefix}/gt_coverage.csv", 'w', newline='')
+	csv = writer(csv_dst)
 
 	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
 
@@ -192,9 +192,9 @@ def produce_crop_recall():
 	missed = gt_count - cr_count
 	cr_str = str(CONFIG_YOLO_CROP_RECALL_THRESHOLD)
 
-	__csv = open(f"{prefix}/crop_recall_{cr_str}.csv", 'w',
-		     newline='')
-	csv = writer(__csv)
+	csv_dst = open(f"{prefix}/crop_recall_{cr_str}.csv", 'w',
+		       newline='')
+	csv = writer(csv_dst)
 
 	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
 
@@ -215,8 +215,8 @@ def produce_crop_recall():
 def produce_crop_efficiencies():
 	*_, effs, confs = zip(*crop_efficiencies)
 
-	__csv = open(f"{prefix}/crop_efficiency.csv", 'w', newline='')
-	csv = writer(__csv)
+	csv_dst = open(f"{prefix}/crop_efficiency.csv", 'w', newline='')
+	csv = writer(csv_dst)
 
 	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
 
@@ -253,8 +253,8 @@ def produce_detection_recall():
 	recall = dr_count / gt_count
 	missed = gt_count - dr_count
 
-	__csv = open(f"{prefix}/detection_recall.csv", 'w', newline='')
-	csv = writer(__csv)
+	csv_dst = open(f"{prefix}/detection_recall.csv", 'w', newline='')
+	csv = writer(csv_dst)
 
 	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
 
@@ -276,8 +276,8 @@ def produce_detection_precision():
 	precision = dr_count / pred_count
 	fp_count = pred_count - dr_count
 
-	__csv = open(f"{prefix}/detection_precision.csv", 'w', newline='')
-	csv = writer(__csv)
+	csv_dst = open(f"{prefix}/detection_precision.csv", 'w', newline='')
+	csv = writer(csv_dst)
 
 	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
 
@@ -304,9 +304,9 @@ def produce_detection_recall_by_spine_length():
 	edges = quantile(spine_lengths, quantiles)
 	bins = range(1, CONFIG_YOLO_SPINE_BINS + 1)
 
-	__csv = open(f"{prefix}/detection_recall_by_spine_length.csv", 'w',
-		     newline='')
-	csv = writer(__csv)
+	csv_dst = open(f"{prefix}/detection_recall_by_spine_length.csv", 'w',
+		       newline='')
+	csv = writer(csv_dst)
 
 	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
 
