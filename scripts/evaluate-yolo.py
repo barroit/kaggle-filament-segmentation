@@ -25,6 +25,9 @@ prefix = f"{CONFIG_EVALUATION_DIR}/{argv[1]}"
 annotations_src = open(DATASET_SHARED_ANNOTATIONS)
 annotations = json_load(annotations_src)
 
+periods_src = open(DATASET_SHARED_PERIODS)
+periods = json_load(periods_src)
+
 label_inputs = dict()
 gt_shapes = dict()
 
@@ -40,14 +43,16 @@ pred_count = 0
 spine_lengths = list()
 spine_detected = list()
 
+recall_map = dict()
+
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=f"{DATASET_YOLO_DIR}/test/images", stream=True,
 		       save=False, verbose=False, retina_masks=True, device=0,
 		       batch=CONFIG_YOLO_PRED_BATCH)
 
-summary_plot = subplots(2, 5, figsize=(32, 12.8))
+summary_plot = subplots(2, 6, figsize=(38.4, 12.8))
 summary_fig = summary_plot[0]
-summary_layout = [0, 5, 2, 1, 6, 3, 8, 4, 7, 9]
+summary_layout = [0, 6, 2, 1, 7, 3, 9, 4, 5, 8, 10, 11]
 summary_axes = iter(summary_plot[1].flat[summary_layout])
 
 def fetch_gt_shapes(file):
@@ -149,6 +154,9 @@ def eval_detection_recall_by_spine_length(ctx):
 
 		spine_lengths.append(length)
 		spine_detected.append(idx in matched)
+
+def eval_detection_recall_by_observation_period(ctx):
+	recall_map[ctx.name] = (ctx.gt_count, ctx.tp_count)
 
 def produce_gt_coverages():
 	*_, covs, confs = zip(*gt_coverages)
@@ -342,6 +350,59 @@ def produce_detection_recall_by_spine_length():
 	plot_fig.savefig(f"{prefix}/detection_recall_by_spine_length.png")
 	close(plot_fig)
 
+def produce_detection_recall_by_observation_period():
+	indices = list()
+	recalls = list()
+
+	csv_dst = open(f"{prefix}/detection_recall_by_observation_period.csv",
+		       'w', newline='')
+	csv = writer(csv_dst)
+
+	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
+	summary_axis = next(summary_axes)
+
+	csv.writerow(('period', 'gt_count', 'tp_count', 'recall'))
+
+	for period in periods:
+		idx = period['idx']
+		gt_count = 0
+		tp_count = 0
+
+		if period['set'] != 'test':
+			continue
+
+		for name in period['images']:
+			gt, tp = recall_map[name]
+
+			gt_count += gt
+			tp_count += tp
+
+		if gt_count:
+			recall = tp_count / gt_count
+
+			indices.append(idx)
+			recalls.append(recall)
+			csv.writerow((idx, gt_count, tp_count, recall))
+
+	for axis in (plot_axis, summary_axis):
+		axis.scatter(indices, recalls, s=8, alpha=0.4)
+		axis.set_xlabel('Observation Period')
+		axis.set_ylabel('Detection Recall')
+		axis.set_ylim(0, 1)
+
+		for idx, recall in zip(indices, recalls):
+			if recall * 100 < CONFIG_YOLO_PERIOD_WARN_THRESHOLD:
+				label = str(idx)
+
+				axis.annotate(label, (idx, recall),
+					      xytext=(0, 5), color='red',
+					      textcoords='offset points',
+					      ha='center')
+
+	plot_fig.tight_layout()
+	plot_fig.savefig(f"{prefix}/detection_recall_by_observation_period.png")
+	close(plot_fig)
+
 makedirs(prefix)
 
 for path in glob(f"{DATASET_YOLO_DIR}/test/labels/*.txt"):
@@ -374,6 +435,7 @@ for result in stream:
 	eval_detection_recall(ctx)
 	eval_detection_precision(ctx)
 	eval_detection_recall_by_spine_length(ctx)
+	eval_detection_recall_by_observation_period(ctx)
 
 produce_gt_coverages()
 produce_crop_recall()
@@ -381,6 +443,7 @@ produce_crop_efficiencies()
 produce_detection_recall()
 produce_detection_precision()
 produce_detection_recall_by_spine_length()
+produce_detection_recall_by_observation_period()
 
 for axis in summary_axes:
 	summary_fig.delaxes(axis)
