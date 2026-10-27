@@ -1,19 +1,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "YOLO evaluation"
+menu "YOLO Evaluation"
 
 config YOLO_PRED_BATCH
 	int "Prediction batch size"
 	default 32
+	help
+	  Number of images processed in each prediction batch.
 
-config YOLO_MATCH_IOU_MIN
-	int "Minimum mask IoU for GT matching in percent"
+config YOLO_MATCH_THRESHOLD
+	int "Mask matching threshold"
 	range 0 100
 	default 50
+	help
+	  Predicted masks are considered matched when their IoU with a
+	  ground-truth mask reaches this percentage.
 
-config YOLO_CROP_RECALL_COVERAGE_MIN
-	int "Minimum GT coverage for crop recall in percent"
+config YOLO_CROP_RECALL_THRESHOLD
+	int "Crop recall threshold"
 	range 0 100
 	default 95
+	help
+	  Minimum percentage of a ground-truth filament covered by a
+	  true-positive crop to contribute to crop recall.
 
-endmenu # YOLO evaluation
+endmenu # YOLO Evaluation

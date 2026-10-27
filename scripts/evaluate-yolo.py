@@ -19,11 +19,6 @@ from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
 
-iou_threshold = CONFIG_YOLO_MATCH_IOU_MIN / 100
-cr_threshold = CONFIG_YOLO_CROP_RECALL_COVERAGE_MIN / 100
-
-cr_threshold_str = str(CONFIG_YOLO_CROP_RECALL_COVERAGE_MIN)
-
 prefix = f"{CONFIG_EVALUATION_DIR}/{argv[1]}"
 
 label_inputs = dict()
@@ -75,7 +70,7 @@ def find_tp_pairs(ctx):
 		for gt_idx, gt_mask in enumerate(ctx.gt_masks):
 			iou = mask_calc_iou(pred_mask, gt_mask)
 
-			if iou >= iou_threshold:
+			if iou * 100 >= CONFIG_YOLO_MATCH_THRESHOLD:
 				candidates.append((iou, pred_idx, gt_idx))
 
 	candidates.sort(reverse=True)
@@ -109,7 +104,7 @@ def eval_crop_recall(ctx):
 	global cr_count
 
 	for *_, gt_coverage, _ in selected:
-		if gt_coverage >= cr_threshold:
+		if gt_coverage * 100 >= CONFIG_YOLO_CROP_RECALL_THRESHOLD:
 			cr_count += 1
 
 def eval_crop_efficiencies(ctx):
@@ -173,8 +168,9 @@ def eval_detection_precision(ctx):
 def produce_crop_recall():
 	recall = cr_count / gt_count
 	missed = gt_count - cr_count
+	cr_str = str(CONFIG_YOLO_CROP_RECALL_THRESHOLD)
 
-	__csv = open(f"{prefix}/crop_recall_{cr_threshold_str}.csv", 'w',
+	__csv = open(f"{prefix}/crop_recall_{cr_str}.csv", 'w',
 		     newline='')
 	csv = writer(__csv)
 
@@ -185,10 +181,10 @@ def produce_crop_recall():
 
 		axis.bar_label(bars, fmt='%d')
 		axis.set_ylabel('GT Filaments')
-		axis.set_title(f"Crop Recall@{cr_threshold_str} = {recall:.2%}")
+		axis.set_title(f"Crop Recall@{cr_str} = {recall:.2%}")
 
 	plot_fig.tight_layout()
-	plot_fig.savefig(f"{prefix}/crop_recall_{cr_threshold_str}.png")
+	plot_fig.savefig(f"{prefix}/crop_recall_{cr_str}.png")
 	close(plot_fig)
 
 	csv.writerow(('cr_count', 'gt_count', 'recall'))
