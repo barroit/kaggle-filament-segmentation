@@ -32,11 +32,26 @@ bad = (
 
 src = open(DATASET_SHARED_ANNOTATIONS)
 annotations = json_load(src)
-dst = open(DATASET_SHARED_ANNOTATIONS, 'w+')
 
-for annos in annotations.values():
-	for anno in annos[:]:
-		if anno['id'] in bad:
-			annos.remove(anno)
+periods_src = open(DATASET_SHARED_PERIODS)
+periods = json_load(periods_src)
+periods_dst = open(DATASET_SHARED_PERIODS, 'w+')
 
-json_dump(annotations, dst, separators=(',', ':'))
+for period in periods:
+	images = len(period['images'])
+
+	for idx in range(images - 1, -1, -1):
+		name = period['images'][idx]
+		annos = annotations[name]
+
+		for anno in annos[:]:
+			if anno['id'] in bad:
+				annos.remove(anno)
+
+		period['annos'][idx] = len(annos)
+
+		if not period['annos'][idx]:
+			period['images'].pop(idx)
+			period['annos'].pop(idx)
+
+json_dump(periods, periods_dst, separators=(',', ':'))
