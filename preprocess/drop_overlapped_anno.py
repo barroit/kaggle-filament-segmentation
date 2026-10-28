@@ -38,10 +38,31 @@ if __name__ == '__main__':
 
 	src = open(DATASET_SHARED_ANNOTATIONS)
 	annotations = json_load(src)
-	dst = open(DATASET_SHARED_ANNOTATIONS, 'w+')
 
-	tasks = annotations.items()
+	periods_src = open(DATASET_SHARED_PERIODS)
+	periods = json_load(periods_src)
+	periods_dst = open(DATASET_SHARED_PERIODS, 'w+')
+
+	tasks = list()
+	results = None
+
+	for period in periods:
+		for name in period['images']:
+			tasks.append((name, annotations[name]))
+
 	results = pool.map(drop_overlapped_anno, tasks)
-
 	annotations = dict(results)
-	json_dump(annotations, dst, separators=(',', ':'))
+
+	for period in periods:
+		images = len(period['images'])
+
+		for idx in range(images - 1, -1, -1):
+			name = period['images'][idx]
+
+			period['annos'][idx] = len(annotations[name])
+
+			if not period['annos'][idx]:
+				period['images'].pop(idx)
+				period['annos'].pop(idx)
+
+	json_dump(periods, periods_dst, separators=(',', ':'))
