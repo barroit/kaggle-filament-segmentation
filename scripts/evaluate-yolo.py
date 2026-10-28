@@ -44,6 +44,7 @@ spine_lengths = list()
 spine_detected = list()
 
 recall_map = dict()
+precision_map = dict()
 
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=f"{DATASET_YOLO_DIR}/test/images", stream=True,
@@ -52,7 +53,7 @@ stream = model.predict(source=f"{DATASET_YOLO_DIR}/test/images", stream=True,
 
 summary_plot = subplots(2, 6, figsize=(38.4, 12.8))
 summary_fig = summary_plot[0]
-summary_layout = [0, 6, 2, 1, 7, 3, 9, 4, 5, 8, 10, 11]
+summary_layout = [0, 6, 2, 1, 7, 3, 9, 4, 5, 11, 8, 10]
 summary_axes = iter(summary_plot[1].flat[summary_layout])
 
 def fetch_gt_shapes(file):
@@ -141,7 +142,7 @@ def eval_detection_recall(ctx):
 def eval_detection_precision(ctx):
 	pass
 
-def eval_detection_recall_by_spine_length(ctx):
+def eval_detection_recall_by_spine(ctx):
 	matched = set()
 	annos = annotations[ctx.name]
 
@@ -155,8 +156,11 @@ def eval_detection_recall_by_spine_length(ctx):
 		spine_lengths.append(length)
 		spine_detected.append(idx in matched)
 
-def eval_detection_recall_by_observation_period(ctx):
+def eval_detection_recall_by_period(ctx):
 	recall_map[ctx.name] = (ctx.gt_count, ctx.tp_count)
+
+def eval_detection_precision_by_period(ctx):
+	precision_map[ctx.name] = (ctx.tp_count, ctx.pred_count)
 
 def produce_gt_coverages():
 	*_, covs, confs = zip(*gt_coverages)
@@ -303,7 +307,7 @@ def produce_detection_precision():
 	csv.writerow(('tp_count', 'pred_count', 'precision'))
 	csv.writerow((dr_count, pred_count, precision))
 
-def produce_detection_recall_by_spine_length():
+def produce_detection_recall_by_spine():
 	gt_counts = [0] * CONFIG_YOLO_SPINE_BINS
 	tp_counts = [0] * CONFIG_YOLO_SPINE_BINS
 	recalls = list()
@@ -312,7 +316,7 @@ def produce_detection_recall_by_spine_length():
 	edges = quantile(spine_lengths, quantiles)
 	bins = range(1, CONFIG_YOLO_SPINE_BINS + 1)
 
-	csv_dst = open(f"{prefix}/detection_recall_by_spine_length.csv", 'w',
+	csv_dst = open(f"{prefix}/detection_recall_by_spine.csv", 'w',
 		       newline='')
 	csv = writer(csv_dst)
 
@@ -347,14 +351,14 @@ def produce_detection_recall_by_spine_length():
 		axis.set_ylim(0, 1)
 
 	plot_fig.tight_layout()
-	plot_fig.savefig(f"{prefix}/detection_recall_by_spine_length.png")
+	plot_fig.savefig(f"{prefix}/detection_recall_by_spine.png")
 	close(plot_fig)
 
-def produce_detection_recall_by_observation_period():
+def produce_detection_recall_by_period():
 	indices = list()
 	recalls = list()
 
-	csv_dst = open(f"{prefix}/detection_recall_by_observation_period.csv",
+	csv_dst = open(f"{prefix}/detection_recall_by_period.csv",
 		       'w', newline='')
 	csv = writer(csv_dst)
 
@@ -395,12 +399,67 @@ def produce_detection_recall_by_observation_period():
 				label = str(idx)
 
 				axis.annotate(label, (idx, recall),
-					      xytext=(0, 5), color='red',
+					      xytext=(0, 5), ha='center',
 					      textcoords='offset points',
-					      ha='center')
+					      color='red', alpha=0.5,
+					      rotation=45)
 
 	plot_fig.tight_layout()
-	plot_fig.savefig(f"{prefix}/detection_recall_by_observation_period.png")
+	plot_fig.savefig(f"{prefix}/detection_recall_by_period.png")
+	close(plot_fig)
+
+def produce_detection_precision_by_period():
+	indices = list()
+	precisions = list()
+
+	csv_dst = open(f"{prefix}/detection_precision_by_period.csv",
+		       'w', newline='')
+	csv = writer(csv_dst)
+
+	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
+	summary_axis = next(summary_axes)
+
+	csv.writerow(('period', 'pred_count', 'tp_count', 'precision'))
+
+	for period in periods:
+		idx = period['idx']
+		tp_count = 0
+		pred_count = 0
+
+		if period['set'] != 'test':
+			continue
+
+		for name in period['images']:
+			tp, pred = precision_map[name]
+
+			tp_count += tp
+			pred_count += pred
+
+		if pred_count:
+			precision = tp_count / pred_count
+
+			indices.append(idx)
+			precisions.append(precision)
+			csv.writerow((idx, pred_count, tp_count, precision))
+
+	for axis in (plot_axis, summary_axis):
+		axis.scatter(indices, precisions, s=8, alpha=0.4)
+		axis.set_xlabel('Observation Period')
+		axis.set_ylabel('Detection Precision')
+		axis.set_ylim(0, 1)
+
+		for idx, precision in zip(indices, precisions):
+			if precision * 100 < CONFIG_YOLO_PERIOD_WARN_THRESHOLD:
+				label = str(idx)
+
+				axis.annotate(label, (idx, precision),
+					      xytext=(0, 5), ha='center',
+					      textcoords='offset points',
+					      color='red', alpha=0.5,
+					      rotation=45)
+
+	plot_fig.tight_layout()
+	plot_fig.savefig(f"{prefix}/detection_precision_by_period.png")
 	close(plot_fig)
 
 makedirs(prefix)
@@ -434,16 +493,18 @@ for result in stream:
 	eval_crop_efficiencies(ctx)
 	eval_detection_recall(ctx)
 	eval_detection_precision(ctx)
-	eval_detection_recall_by_spine_length(ctx)
-	eval_detection_recall_by_observation_period(ctx)
+	eval_detection_recall_by_spine(ctx)
+	eval_detection_recall_by_period(ctx)
+	eval_detection_precision_by_period(ctx)
 
 produce_gt_coverages()
 produce_crop_recall()
 produce_crop_efficiencies()
 produce_detection_recall()
 produce_detection_precision()
-produce_detection_recall_by_spine_length()
-produce_detection_recall_by_observation_period()
+produce_detection_recall_by_spine()
+produce_detection_recall_by_period()
+produce_detection_precision_by_period()
 
 for axis in summary_axes:
 	summary_fig.delaxes(axis)
