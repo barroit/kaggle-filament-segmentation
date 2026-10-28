@@ -49,7 +49,8 @@ precision_map = dict()
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=f"{DATASET_YOLO_DIR}/test/images", stream=True,
 		       save=False, verbose=False, retina_masks=True, device=0,
-		       batch=CONFIG_YOLO_PRED_BATCH)
+		       batch=CONFIG_YOLO_PRED_BATCH,
+		       conf=CONFIG_YOLO_CONF_THRESHOLD / 100)
 
 summary_plot = subplots(2, 6, figsize=(38.4, 12.8))
 summary_fig = summary_plot[0]

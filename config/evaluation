@@ -8,6 +8,13 @@ config YOLO_PRED_BATCH
 	help
 	  Number of images processed in each prediction batch.
 
+config YOLO_CONF_THRESHOLD
+	int "Prediction confidence threshold"
+	range 0 100
+	default 35
+	help
+	  Predictions with confidence below this percentage are discarded.
+
 config YOLO_MATCH_THRESHOLD
 	int "Mask matching threshold"
 	range 0 100
