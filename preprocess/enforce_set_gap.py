@@ -23,11 +23,6 @@ excluded = dict()
 idx_next = -1
 score_best = 1
 
-train_count = 0
-validate_count = 0
-test_count = 0
-total = 0
-
 days.append({
 	'date': date_from_str(periods[0]['images'][0]),
 	'set': periods[0]['set'],
@@ -89,20 +84,3 @@ for period in periods[:]:
 		periods.remove(period)
 
 json_dump(periods, dst, separators=(',', ':'))
-
-for period in periods:
-	count = sum(period['annos'])
-
-	if period['set'] == 'train':
-		train_count += count
-	elif period['set'] == 'validate':
-		validate_count += count
-	else:
-		test_count += count
-
-total = train_count + validate_count + test_count
-
-print('After enforcing the temporal gap:')
-print(f"    Train\t{train_count}\t({train_count / total * 100:.2f}%)")
-print(f"    Validate\t{validate_count}\t({validate_count / total * 100:.2f}%)")
-print(f"    Test\t{test_count}\t({test_count / total * 100:.2f}%)")
