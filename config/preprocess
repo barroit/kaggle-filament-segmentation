@@ -2,11 +2,21 @@
 
 menu "Data Preprocessing"
 
-config DROP_SUN_LIMB
+menuconfig DROP_SUN_LIMB
 	bool "Drop solar limb"
 	default n
 	help
 	  Enable this to erase the solar limb from input images
+
+if DROP_SUN_LIMB
+
+config SUN_DISK_RADIUS
+	int "Solar disk radius"
+	default 894
+	help
+	  Radius of the solar disk in pixels.
+
+endif # menuconfig DROP_SUN_LIMB
 
 config DROP_CORRUPTED_ANNO
 	bool "Drop corrupted annotations"

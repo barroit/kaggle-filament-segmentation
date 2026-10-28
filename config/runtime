@@ -26,9 +26,4 @@ config IMAGE_DIMENSION
 	string "YOLO input image dimensions (width height in pixels)"
 	default "2048 2048"
 
-config SUN_DISK_RADIUS
-	int "Solar disk radius in pixels"
-	depends on DROP_SUN_LIMB
-	default 894
-
 endmenu # Dataset parameters

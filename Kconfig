@@ -6,8 +6,8 @@ $(warn-off)
 
 source "config/preprocess"
 
-source "config/runtime"
-
 source "config/evaluation"
+
+source "config/runtime"
 
 source "config/preview"
