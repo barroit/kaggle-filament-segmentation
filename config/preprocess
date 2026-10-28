@@ -4,7 +4,7 @@ menu "Data Preprocessing"
 
 config DROP_SUN_LIMB
 	bool "Drop solar limb"
-	default y
+	default n
 	help
 	  Enable this to erase the solar limb from input images
 
