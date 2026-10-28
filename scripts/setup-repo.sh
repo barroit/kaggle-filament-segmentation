@@ -22,7 +22,7 @@ fi
 yolo settings weights_dir=$PWD/model >/dev/null
 
 cat <<EOF >$lib/silent_interrupt.pth
-import sys; from sys import __excepthook__; \
+import sys; \
 sys.excepthook = lambda type, value, tb: \
-__excepthook__(type, value, tb) if type is not KeyboardInterrupt else None
+sys.__excepthook__(type, value, tb) if type is not KeyboardInterrupt else None
 EOF
