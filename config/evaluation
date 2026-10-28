@@ -33,7 +33,7 @@ config YOLO_CROP_RECALL_THRESHOLD
 
 config YOLO_SPINE_BINS
 	int "Number of spine length bins"
-	default 5
+	default 7
 	help
 	  Number of quantile bins used to group filaments by spine length.
 
