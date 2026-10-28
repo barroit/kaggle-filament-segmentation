@@ -19,6 +19,10 @@ copytree(MAGFILO_IMAGE_DIR, DATASET_SHARED_IMAGE_DIR)
 apply('to_png')
 apply('format_anno')
 
+apply('partition_period')
+apply('assign_dataset')
+apply('enforce_set_gap')
+
 if CONFIG_DROP_SUN_LIMB:
 	apply('drop_sun_limb')
 
@@ -30,7 +34,3 @@ if CONFIG_DROP_CONFLICTED_ANNO:
 
 if CONFIG_DROP_OVERLAPPED_ANNO:
 	apply('drop_overlapped_anno')
-
-apply('partition_period')
-apply('assign_dataset')
-apply('enforce_set_gap')
