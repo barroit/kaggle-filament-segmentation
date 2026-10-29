@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "Preview appearance"
+mainmenu "Preview Appearance Configuration"
+
+$(warn-off)
 
 config DRAW_BBOX_RGBA
 	string "Bounding box color in RGBA"
@@ -49,5 +51,3 @@ config DRAW_LABEL_BORDER_WIDTH
 config DRAW_FILL_RGBA
 	string "Fill color in RGBA"
 	default "255 0 0 15"
-
-endmenu # Preview rendering settings

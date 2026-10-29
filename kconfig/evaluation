@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "YOLO Evaluation"
+mainmenu "YOLO Evaluation Configuration"
+
+$(warn-off)
 
 config YOLO_PRED_BATCH
 	int "Prediction batch size"
@@ -44,5 +46,3 @@ config YOLO_PERIOD_WARN_THRESHOLD
 	help
 	  Observation periods with recall below this percentage are annotated
 	  on the recall plot.
-
-endmenu # YOLO Evaluation

@@ -5,8 +5,7 @@
 /model
 /preview
 
-/.config
-/.config.old
+/kconfig/gen/
 
 /runs
 /metrics

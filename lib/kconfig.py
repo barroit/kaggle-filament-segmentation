@@ -3,7 +3,9 @@
 # Copyright 2026 Jiamu Sun <39@barroit.sh>
 #
 
-from kconfiglib.kconfiglib import Kconfig, BOOL, INT, HEX, STRING
+from glob import glob
+from kconfiglib.kconfiglib import Kconfig as alloc_kconfig, BOOL, INT, HEX, \
+				  STRING
 
 __all__ = []
 __globals__ = globals()
@@ -12,9 +14,11 @@ bool = {
 	'y': True,
 	'n': False,
 }
-kconfig = Kconfig('Kconfig')
+kconfig = alloc_kconfig('Kconfig')
 
-kconfig.load_config('.config')
+for name in glob('kconfig/gen/*'):
+	if not name.endswith('.old'):
+		kconfig.load_config(name, replace=False)
 
 for symbol in kconfig.unique_defined_syms:
 	name = f"CONFIG_{symbol.name}"

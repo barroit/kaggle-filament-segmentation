@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+mainmenu "Runtime Configuration"
+
+$(warn-off)
+
 menu "Input and output directories"
 
 config MAGFILO_DIR

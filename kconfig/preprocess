@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-menu "Data Preprocessing"
+mainmenu "Data Preprocessing Configuration"
+
+$(warn-off)
 
 menuconfig DROP_SUN_LIMB
 	bool "Drop solar limb"
@@ -112,5 +114,3 @@ config TEST_SET_PROPORTION
 	  Target proportion of annotations assigned to the test set.
 
 endmenu # Dataset Splitting
-
-endmenu # Data Preprocessing

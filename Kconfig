@@ -1,13 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-mainmenu "$(first-line,README) Configuration"
+source "kconfig/preprocess"
 
-$(warn-off)
+source "kconfig/evaluation"
 
-source "config/preprocess"
+source "kconfig/runtime"
 
-source "config/evaluation"
-
-source "config/runtime"
-
-source "config/preview"
+source "kconfig/preview"
