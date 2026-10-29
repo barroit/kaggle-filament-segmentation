@@ -6,6 +6,7 @@
 /preview
 
 /kconfig/gen/
+/*.tar
 
 /runs
 /metrics
