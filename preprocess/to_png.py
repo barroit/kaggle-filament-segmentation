@@ -6,13 +6,13 @@
 from multiprocessing import Pool as alloc_pool, cpu_count
 from os import unlink
 
-from cv2 import imread, imwrite
+from cv2 import IMREAD_GRAYSCALE, imread, imwrite
 
 from lib.path import *
 
 def to_png(src):
 	dst = path_replace_suffix(src, 'png')
-	image = imread(src)
+	image = imread(src, IMREAD_GRAYSCALE)
 
 	imwrite(dst, image)
 	unlink(src)
