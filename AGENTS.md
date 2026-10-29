@@ -1,10 +1,11 @@
 Use single quote for string literals.
 Use double quotes for f-strings.
-Don't use with ... as statement.
-Don't use Path library.
-Don't use os.path.join, format the path with f-string.
+Use from `X` import `Y`, `Z`, ... instead of import `X`.
+Don't use `with` statement.
+Don't use `Path` library.
+Don't use `os.path.join`, format the path with f-string.
 Don't close any file streams.
-Don't pass exist_ok=True to makedirs().
+Don't pass `exist_ok=True` to `os.makedirs`.
 Don't nest function calls. Assign the result of the inner call to a variable before passing it to another function.
 Don't introduce variables midway through a block. Declare variables at the beginning of their enclosing block (script, function, loop, or conditional branch).
 
