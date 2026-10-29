@@ -36,8 +36,9 @@ if __name__ == '__main__':
 	cpus = cpu_count()
 	pool = alloc_pool(cpus)
 
-	src = open(DATASET_SHARED_ANNOTATIONS)
-	annotations = json_load(src)
+	annotations_src = open(DATASET_SHARED_ANNOTATIONS)
+	annotations = json_load(annotations_src)
+	annotations_dst = open(DATASET_SHARED_ANNOTATIONS, 'w+')
 
 	periods_src = open(DATASET_SHARED_PERIODS)
 	periods = json_load(periods_src)
@@ -64,5 +65,7 @@ if __name__ == '__main__':
 			if not period['annos'][idx]:
 				period['images'].pop(idx)
 				period['annos'].pop(idx)
+				del annotations[name]
 
+	json_dump(annotations, annotations_dst, separators=(',', ':'))
 	json_dump(periods, periods_dst, separators=(',', ':'))
