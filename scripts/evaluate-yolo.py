@@ -45,6 +45,9 @@ pred_count = 0
 spine_lengths = list()
 spine_detected = list()
 
+pred_spine_lengths = list()
+pred_spine_matched = list()
+
 recall_map = dict()
 precision_map = dict()
 
@@ -56,7 +59,7 @@ stream = model.predict(source=f"{DATASET_YOLO_DIR}/{input}/images", stream=True,
 
 summary_plot = subplots(2, 6, figsize=(38.4, 12.8))
 summary_fig = summary_plot[0]
-summary_layout = [0, 6, 2, 1, 7, 3, 9, 4, 5, 11, 8, 10]
+summary_layout = [0, 6, 2, 1, 7, 3, 9, 4, 10, 5, 11, 8]
 summary_axes = iter(summary_plot[1].flat[summary_layout])
 
 def fetch_gt_shapes(file):
@@ -158,6 +161,20 @@ def eval_detection_recall_by_spine(ctx):
 
 		spine_lengths.append(length)
 		spine_detected.append(idx in matched)
+
+def eval_detection_precision_by_spine(ctx):
+	matched = set()
+
+	for idx, _ in ctx.tp_pairs:
+		matched.add(idx)
+
+	for idx, mask in enumerate(ctx.pred_masks):
+		bbox = ctx.pred_bboxes[idx]
+		x1, y1, x2, y2 = coord_snap_bbox(bbox)
+		length = mask_calc_spine_length_approx(mask[y1:y2, x1:x2])
+
+		pred_spine_lengths.append(length)
+		pred_spine_matched.append(idx in matched)
 
 def eval_detection_recall_by_period(ctx):
 	recall_map[ctx.name] = (ctx.gt_count, ctx.tp_count)
@@ -349,12 +366,59 @@ def produce_detection_recall_by_spine():
 	for axis in (plot_axis, next(summary_axes)):
 		axis.plot(bins, recalls, marker='o')
 		axis.set_xticks(bins)
-		axis.set_xlabel('Spine Length Quantile')
+		axis.set_xlabel('GT Spine Length')
 		axis.set_ylabel('Detection Recall')
 		axis.set_ylim(0, 1)
 
 	plot_fig.tight_layout()
 	plot_fig.savefig(f"{prefix}/detection_recall_by_spine.png")
+	close(plot_fig)
+
+def produce_detection_precision_by_spine():
+	pred_counts = [0] * CONFIG_YOLO_SPINE_BINS
+	tp_counts = [0] * CONFIG_YOLO_SPINE_BINS
+	precisions = list()
+
+	quantiles = linspace(0, 1, CONFIG_YOLO_SPINE_BINS + 1)
+	edges = quantile(pred_spine_lengths, quantiles)
+	bins = range(1, CONFIG_YOLO_SPINE_BINS + 1)
+
+	csv_dst = open(f"{prefix}/detection_precision_by_spine.csv", 'w',
+		       newline='')
+	csv = writer(csv_dst)
+
+	plot_fig, plot_axis = subplots(figsize=(12.8, 9.6))
+
+	edges[-1] += 1
+
+	for length, matched in zip(pred_spine_lengths, pred_spine_matched):
+		idx = searchsorted(edges[1:-1], length, side='right')
+
+		pred_counts[idx] += 1
+		tp_counts[idx] += matched
+
+	csv.writerow(('bin', 'length_min', 'length_max', 'pred_count',
+		     'tp_count', 'precision'))
+
+	for idx in range(CONFIG_YOLO_SPINE_BINS):
+		precision = None
+
+		if pred_counts[idx]:
+			precision = tp_counts[idx] / pred_counts[idx]
+			csv.writerow((idx + 1, edges[idx], edges[idx + 1],
+				     pred_counts[idx], tp_counts[idx], precision))
+
+		precisions.append(precision)
+
+	for axis in (plot_axis, next(summary_axes)):
+		axis.plot(bins, precisions, marker='o')
+		axis.set_xticks(bins)
+		axis.set_xlabel('Predicted Spine Length')
+		axis.set_ylabel('Detection Precision')
+		axis.set_ylim(0, 1)
+
+	plot_fig.tight_layout()
+	plot_fig.savefig(f"{prefix}/detection_precision_by_spine.png")
 	close(plot_fig)
 
 def produce_detection_recall_by_period():
@@ -497,6 +561,7 @@ for result in stream:
 	eval_detection_recall(ctx)
 	eval_detection_precision(ctx)
 	eval_detection_recall_by_spine(ctx)
+	eval_detection_precision_by_spine(ctx)
 	eval_detection_recall_by_period(ctx)
 	eval_detection_precision_by_period(ctx)
 
@@ -506,6 +571,7 @@ produce_crop_efficiencies()
 produce_detection_recall()
 produce_detection_precision()
 produce_detection_recall_by_spine()
+produce_detection_precision_by_spine()
 produce_detection_recall_by_period()
 produce_detection_precision_by_period()
 
