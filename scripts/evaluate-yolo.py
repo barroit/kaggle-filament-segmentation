@@ -54,7 +54,7 @@ precision_map = dict()
 model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
 stream = model.predict(source=f"{DATASET_YOLO_DIR}/{input}/images", stream=True,
 		       save=False, verbose=False, retina_masks=True, device=0,
-		       batch=CONFIG_YOLO_PRED_BATCH, imgsz=1024,
+		       batch=CONFIG_YOLO_PRED_BATCH,
 		       conf=CONFIG_YOLO_CONF_THRESHOLD / 100)
 
 summary_plot = subplots(2, 6, figsize=(38.4, 12.8))
@@ -79,30 +79,6 @@ def fetch_gt_shapes(file):
 		gt_shapes[file] = (masks, bboxes)
 
 	return gt_shapes[file][0], gt_shapes[file][1]
-
-def find_tp_pairs(ctx):
-	candidates = list()
-	pairs = list()
-	selected_pred = set()
-	selected_gt = set()
-
-	for pred_idx, pred_mask in enumerate(ctx.pred_masks):
-		for gt_idx, gt_mask in enumerate(ctx.gt_masks):
-			iou = mask_calc_iou(pred_mask, gt_mask)
-
-			if iou * 100 >= CONFIG_YOLO_MATCH_THRESHOLD:
-				candidates.append((iou, pred_idx, gt_idx))
-
-	candidates.sort(reverse=True)
-
-	for iou, pred_idx, gt_idx in candidates:
-		if pred_idx not in selected_pred and gt_idx not in selected_gt:
-			pairs.append((pred_idx, gt_idx))
-
-			selected_pred.add(pred_idx)
-			selected_gt.add(gt_idx)
-
-	return pairs
 
 def eval_gt_coverages(ctx):
 	for pred_idx, gt_idx in ctx.tp_pairs:
@@ -549,7 +525,7 @@ for result in stream:
 	ctx.gt_masks, ctx.gt_bboxes = fetch_gt_shapes(label_inputs[ctx.name])
 	ctx.gt_count = len(ctx.gt_masks)
 
-	ctx.tp_pairs = find_tp_pairs(ctx)
+	ctx.tp_pairs = mask_find_tps(ctx.pred_masks, ctx.gt_masks)
 	ctx.tp_count = len(ctx.tp_pairs)
 
 	gt_count += ctx.gt_count

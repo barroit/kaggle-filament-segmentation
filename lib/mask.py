@@ -19,6 +19,7 @@ __all__ = [
 	'mask_calc_iou',
 	'mask_calc_coverage',
 	'mask_calc_spine_length_approx',
+	'mask_find_tps',
 ]
 
 def mask_from_coords(coords):
@@ -99,3 +100,27 @@ def mask_calc_spine_length_approx(mask):
 	largest = graph_select_largest(graph)
 
 	return graph_calc_span(largest)
+
+def mask_find_tps(mask_preds, mask_gts):
+	cands = list()
+	tps = list()
+	seen_pred = set()
+	seen_gt = set()
+
+	for idx_pred, mask_pred in enumerate(mask_preds):
+		for idx_gt, mask_gt in enumerate(mask_gts):
+			iou = mask_calc_iou(mask_pred, mask_gt)
+
+			if iou * 100 >= CONFIG_YOLO_MATCH_THRESHOLD:
+				cands.append((iou, idx_pred, idx_gt))
+
+	cands.sort(reverse=True)
+
+	for iou, idx_pred, idx_gt in cands:
+		if idx_pred not in seen_pred and idx_gt not in seen_gt:
+			tps.append((idx_pred, idx_gt))
+
+			seen_pred.add(idx_pred)
+			seen_gt.add(idx_gt)
+
+	return tps
