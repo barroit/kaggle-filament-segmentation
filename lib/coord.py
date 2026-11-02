@@ -40,8 +40,8 @@ def coord_load_label_yolo(line):
 
 	return rint(scale * CONFIG_IMAGE_DIMENSION).astype(int32)
 
-def coord_calc_bbox(coords):
-	x, y, width, height = bounding_rect(coords)
+def coord_calc_bbox(region):
+	x, y, width, height = bounding_rect(region)
 
 	return (x, y, x + width, y + height)
 

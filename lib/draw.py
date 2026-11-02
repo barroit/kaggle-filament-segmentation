@@ -27,6 +27,7 @@ __all__ = [
 	'draw_blend_border',
 	'draw_blend_label',
 	'draw_blend_area',
+	'draw_blend_area_mask',
 ]
 
 draw_polylines = polylines
@@ -111,4 +112,10 @@ def draw_blend_area(image, coords, color=fill_color, alpha=fill_alpha):
 	overlay = image.copy()
 
 	draw_fill_polygon(overlay, [coords], color)
+	return draw_blend(image, overlay, alpha)
+
+def draw_blend_area_mask(image, mask, color=fill_color, alpha=fill_alpha):
+	overlay = image.copy()
+
+	overlay[mask != 0] = color[:3]
 	return draw_blend(image, overlay, alpha)
