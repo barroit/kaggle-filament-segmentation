@@ -81,33 +81,34 @@ def draw_label_border(image, xy, text, color):
 	__draw_text(image, xy, text, color,
 		    CONFIG_DRAW_FONT_THICKNESS + CONFIG_DRAW_LABEL_BORDER_WIDTH)
 
-def draw_blend_bbox(image, coords):
+def draw_blend_bbox(image, coords, color=bbox_color, alpha=bbox_alpha):
 	overlay = image.copy()
 
-	draw_rectangle(overlay, coords, bbox_color, CONFIG_DRAW_BBOX_WIDTH)
-	return draw_blend(image, overlay, bbox_alpha)
+	draw_rectangle(overlay, coords, color, CONFIG_DRAW_BBOX_WIDTH)
+	return draw_blend(image, overlay, alpha)
 
-def draw_blend_spine(image, coords):
+def draw_blend_spine(image, coords, color=spine_color, alpha=spine_alpha):
 	overlay = image.copy()
 
-	draw_polyline(overlay, coords, spine_color, CONFIG_DRAW_SPINE_WIDTH)
-	return draw_blend(image, overlay, spine_alpha)
+	draw_polyline(overlay, coords, color, CONFIG_DRAW_SPINE_WIDTH)
+	return draw_blend(image, overlay, alpha)
 
-def draw_blend_border(image, coords):
+def draw_blend_border(image, coords, color=border_color, alpha=border_alpha):
 	overlay = image.copy()
 
-	draw_polyline(overlay, coords, border_color, CONFIG_DRAW_BORDER_WIDTH)
-	return draw_blend(image, overlay, border_alpha)
+	draw_polyline(overlay, coords, color, CONFIG_DRAW_BORDER_WIDTH)
+	return draw_blend(image, overlay, alpha)
 
-def draw_blend_label(image, xy, label):
+def draw_blend_label(image, xy, label, color=label_color, alpha=label_alpha,
+		     border_color=label_border_color):
 	overlay = image.copy()
 
-	draw_label(overlay, xy, label, label_color)
-	draw_label_border(overlay, xy, label, label_border_color)
-	return draw_blend(image, overlay, label_alpha)
+	draw_label(overlay, xy, label, color)
+	draw_label_border(overlay, xy, label, border_color)
+	return draw_blend(image, overlay, alpha)
 
-def draw_blend_area(image, coords):
+def draw_blend_area(image, coords, color=fill_color, alpha=fill_alpha):
 	overlay = image.copy()
 
-	draw_fill_polygon(overlay, [coords], fill_color)
-	return draw_blend(image, overlay, fill_alpha)
+	draw_fill_polygon(overlay, [coords], color)
+	return draw_blend(image, overlay, alpha)
