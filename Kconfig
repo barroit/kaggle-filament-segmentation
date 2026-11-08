@@ -2,6 +2,8 @@
 
 source "kconfig/preprocess"
 
+source "kconfig/predict"
+
 source "kconfig/evaluation"
 
 source "kconfig/runtime"

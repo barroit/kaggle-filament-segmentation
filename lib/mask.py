@@ -111,7 +111,7 @@ def mask_find_tps(mask_preds, mask_gts):
 		for idx_gt, mask_gt in enumerate(mask_gts):
 			iou = mask_calc_iou(mask_pred, mask_gt)
 
-			if iou * 100 >= CONFIG_YOLO_MATCH_THRESHOLD:
+			if iou * 100 >= CONFIG_YOLO_GT_MATCH_THRESHOLD:
 				cands.append((iou, idx_pred, idx_gt))
 
 	cands.sort(reverse=True)

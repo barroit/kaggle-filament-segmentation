@@ -1,23 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-mainmenu "YOLO Evaluation Configuration"
+mainmenu "Evaluation Configuration"
 
 $(warn-off)
 
-config YOLO_PRED_BATCH
-	int "Prediction batch size"
-	default 32
-	help
-	  Number of images processed in each prediction batch.
-
-config YOLO_CONF_THRESHOLD
-	int "Prediction confidence threshold"
-	range 0 100
-	default 35
-	help
-	  Predictions with confidence below this percentage are discarded.
-
-config YOLO_MATCH_THRESHOLD
+config YOLO_GT_MATCH_THRESHOLD
 	int "Mask matching threshold"
 	range 0 100
 	default 50
