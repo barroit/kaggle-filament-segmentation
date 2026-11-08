@@ -62,18 +62,18 @@ def draw(src, dst, pred_masks, pred_confs, gt_masks, tp_pairs):
 	for mask in gt_masks:
 		image = draw_blend_area_mask(image, mask, gt_color, gt_alpha)
 
-	for idx in tp_idxs:
-		mask = pred_masks[idx]
-		conf = pred_confs[idx]
-
-		image = draw_pred(image, mask, conf, tp_color, tp_alpha)
-
 	for idx, mask in enumerate(pred_masks):
 		if idx not in tp_idxs:
 			mask = pred_masks[idx]
 			conf = pred_confs[idx]
 
 			image = draw_pred(image, mask, conf, fp_color, fp_alpha)
+
+	for idx in tp_idxs:
+		mask = pred_masks[idx]
+		conf = pred_confs[idx]
+
+		image = draw_pred(image, mask, conf, tp_color, tp_alpha)
 
 	draw_dump(image, dst)
 
