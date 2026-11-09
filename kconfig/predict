@@ -6,7 +6,7 @@ $(warn-off)
 
 config YOLO_PRED_BATCH
 	int "Prediction batch size"
-	default 32
+	default 8
 	help
 	  Number of images processed in each prediction batch.
 
