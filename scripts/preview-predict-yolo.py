@@ -90,8 +90,8 @@ if __name__ == '__main__':
 	stream = model.predict(source=f"{DATASET_YOLO_DIR}/{split}/images",
 			       stream=True, save=False, verbose=False,
 			       retina_masks=True, device=0,
-			       batch=CONFIG_YOLO_PRED_BATCH,
-			       conf=CONFIG_YOLO_CONF_THRESHOLD / 100)
+			       batch=CONFIG_PRED_BATCH_SIZE,
+			       conf=CONFIG_PRED_CONF_THRESHOLD / 100)
 
 	for path in glob(f"{DATASET_YOLO_DIR}/{split}/labels/*.txt"):
 		name = path_resolve_stem(path)

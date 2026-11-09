@@ -4,13 +4,13 @@ mainmenu "Prediction Configuration"
 
 $(warn-off)
 
-config YOLO_PRED_BATCH
+config PRED_BATCH_SIZE
 	int "Prediction batch size"
 	default 8
 	help
 	  Number of images processed in each prediction batch.
 
-config YOLO_CONF_THRESHOLD
+config PRED_CONF_THRESHOLD
 	int "Prediction confidence threshold"
 	range 0 100
 	default 30
