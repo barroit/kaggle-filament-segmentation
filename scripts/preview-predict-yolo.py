@@ -17,10 +17,26 @@ from lib.draw import *
 from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
+from lib.predict import *
 
 GT_COLOR = (255, 255, 0, 50)
 TP_COLOR = (0, 0, 255, 50)
 FP_COLOR = (255, 0, 0, 50)
+
+LABLE_COLOR = [
+	(0, 235, 255, 220),	# Cyan
+	(50, 110, 255, 230),	# Electric blue
+	(70, 255, 100, 220),	# Lime green
+	(255, 235, 40, 230),	# Yellow
+	(190, 90, 255, 230),	# Violet
+	(255, 255, 255, 210),	# White
+	(0, 255, 180, 230),	# Turquoise
+	(80, 60, 255, 230),	# Indigo
+	(180, 255, 40, 220),	# Chartreuse
+	(255, 80, 220, 230),	# Magenta
+	(120, 200, 255, 230),	# Sky blue
+	(180, 255, 200, 220),	# Mint
+]
 
 def load_gt_masks(path):
 	masks = list()
@@ -34,18 +50,26 @@ def load_gt_masks(path):
 
 	return masks
 
-def draw_pred(image, mask, conf, color, alpha):
+def draw_pred(image, idx, mask, color, alpha):
 	bbox = coord_calc_bbox(mask)
-	conf_str = str(conf)
+	idx_str = str(idx)
+
+	color_next = idx % len(LABLE_COLOR)
+	label_color = color_rgba_to_bgra(LABLE_COLOR[color_next])
+	label_alpha = color_alpha_percent(label_color)
 
 	image = draw_blend_area_mask(image, mask, color, alpha)
-	image = draw_blend_label(image, bbox, conf_str)
+	image = draw_blend_label(image, bbox, idx_str, label_color, label_alpha,
+				 label_color)
 
 	return image
 
-def draw(src, dst, pred_masks, pred_confs, gt_masks, tp_pairs):
+def draw(src, dst, res, gt_masks):
+	pred = pred_format_result(res)
 	image = draw_load(src)
+
 	tp_idxs = set()
+	tp_pairs = mask_find_tps(pred.masks, gt_masks)
 
 	gt_color = color_rgba_to_bgra(GT_COLOR)
 	gt_alpha = color_alpha_percent(gt_color)
@@ -62,18 +86,14 @@ def draw(src, dst, pred_masks, pred_confs, gt_masks, tp_pairs):
 	for mask in gt_masks:
 		image = draw_blend_area_mask(image, mask, gt_color, gt_alpha)
 
-	for idx, mask in enumerate(pred_masks):
+	for idx, mask in enumerate(pred.masks):
 		if idx not in tp_idxs:
-			mask = pred_masks[idx]
-			conf = pred_confs[idx]
-
-			image = draw_pred(image, mask, conf, fp_color, fp_alpha)
+			image = draw_pred(image, idx + 1, pred.masks[idx],
+					  fp_color, fp_alpha)
 
 	for idx in tp_idxs:
-		mask = pred_masks[idx]
-		conf = pred_confs[idx]
-
-		image = draw_pred(image, mask, conf, tp_color, tp_alpha)
+		image = draw_pred(image, idx + 1, pred.masks[idx], tp_color,
+				  tp_alpha)
 
 	draw_dump(image, dst)
 
@@ -101,22 +121,18 @@ if __name__ == '__main__':
 	makedirs(prefix)
 
 	for result in stream:
-		result = result.numpy()
-		name = path_resolve_stem(result.path)
+		if len(result):
+			res = result.numpy()
+			name = path_resolve_stem(res.path)
 
-		src = result.path
-		dst = f"{prefix}/{name}.png"
+			src = res.path
+			dst = f"{prefix}/{name}.png"
+			gt_masks = load_gt_masks(label_map[name])
 
-		pred_masks = result.masks.data if result.masks else list()
-		pred_confs = result.boxes.conf
+			task = (src, dst, res, gt_masks)
+			job = pool.apply_async(draw, task)
 
-		gt_masks = load_gt_masks(label_map[name])
-		tp_pairs = mask_find_tps(pred_masks, gt_masks)
-
-		task = (src, dst, pred_masks, pred_confs, gt_masks, tp_pairs)
-		job = pool.apply_async(draw, task)
-
-		jobs.append(job)
+			jobs.append(job)
 
 	pool.close()
 	pool.join()
