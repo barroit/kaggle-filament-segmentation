@@ -13,6 +13,6 @@ config YOLO_PRED_BATCH
 config YOLO_CONF_THRESHOLD
 	int "Prediction confidence threshold"
 	range 0 100
-	default 35
+	default 30
 	help
 	  Predictions with confidence below this percentage are discarded.
