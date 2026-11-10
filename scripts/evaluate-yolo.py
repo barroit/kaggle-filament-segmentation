@@ -74,22 +74,22 @@ def fetch_gt_shapes(file):
 
 	return gt_shapes[file][0], gt_shapes[file][1]
 
-def eval_gt_coverages(ctx):
-	for pred_idx, gt_idx in ctx.tp_pairs:
-		gt_mask = ctx.gt_masks[gt_idx]
-		bbox = ctx.pred_bboxes[pred_idx]
+def eval_gt_coverages(pred):
+	for pred_idx, gt_idx in pred.tp_pairs:
+		gt_mask = pred.gt_masks[gt_idx]
+		bbox = pred.bboxes[pred_idx]
 		x1, y1, x2, y2 = coord_snap_bbox(bbox)
 
 		positive = count_nonzero(gt_mask[y1:y2, x1:x2])
 		total = count_nonzero(gt_mask)
 		gt_coverage = positive / total
 
-		gt_coverages.append((ctx.name, *bbox, gt_coverage,
-				    ctx.pred_confs[pred_idx]))
+		gt_coverages.append((pred.name, *bbox, gt_coverage,
+				    pred.confs[pred_idx]))
 
-def eval_crop_recall(ctx):
+def eval_crop_recall(pred):
 	cov_len = len(gt_coverages)
-	selected = gt_coverages[cov_len - ctx.tp_count:cov_len]
+	selected = gt_coverages[cov_len - pred.tp_count:cov_len]
 
 	global cr_count
 
@@ -97,32 +97,32 @@ def eval_crop_recall(ctx):
 		if gt_coverage * 100 >= CONFIG_YOLO_CROP_RECALL_THRESHOLD:
 			cr_count += 1
 
-def eval_crop_efficiencies(ctx):
-	for pred_idx, gt_idx in ctx.tp_pairs:
-		pred_bbox = ctx.pred_bboxes[pred_idx]
-		gt_bbox = ctx.gt_bboxes[gt_idx]
+def eval_crop_efficiencies(pred):
+	for pred_idx, gt_idx in pred.tp_pairs:
+		pred_bbox = pred.bboxes[pred_idx]
+		gt_bbox = pred.gt_bboxes[gt_idx]
 		x1, y1, x2, y2 = pred_bbox
 
 		intersection = coord_calc_bbox_intersection(pred_bbox, gt_bbox)
 		area = (x2 - x1) * (y2 - y1)
 		efficiency = intersection / area
 
-		crop_efficiencies.append((ctx.name, *ctx.pred_bboxes[pred_idx],
-					 efficiency, ctx.pred_confs[pred_idx]))
+		crop_efficiencies.append((pred.name, *pred.bboxes[pred_idx],
+					 efficiency, pred.confs[pred_idx]))
 
-def eval_detection_recall(ctx):
+def eval_detection_recall(pred):
 	global dr_count
 
-	dr_count += ctx.tp_count
+	dr_count += pred.tp_count
 
-def eval_detection_precision(ctx):
+def eval_detection_precision(pred):
 	pass
 
-def eval_detection_recall_by_spine(ctx):
+def eval_detection_recall_by_spine(pred):
 	matched = set()
-	annos = annotations[ctx.name]
+	annos = annotations[pred.name]
 
-	for _, idx in ctx.tp_pairs:
+	for _, idx in pred.tp_pairs:
 		matched.add(idx)
 
 	for idx, anno in enumerate(annos):
@@ -132,25 +132,25 @@ def eval_detection_recall_by_spine(ctx):
 		spine_lengths.append(length)
 		spine_detected.append(idx in matched)
 
-def eval_detection_precision_by_spine(ctx):
+def eval_detection_precision_by_spine(pred):
 	matched = set()
 
-	for idx, _ in ctx.tp_pairs:
+	for idx, _ in pred.tp_pairs:
 		matched.add(idx)
 
-	for idx, mask in enumerate(ctx.pred_masks):
-		bbox = ctx.pred_bboxes[idx]
+	for idx, mask in enumerate(pred.masks):
+		bbox = pred.bboxes[idx]
 		x1, y1, x2, y2 = coord_snap_bbox(bbox)
 		length = mask_calc_spine_length_approx(mask[y1:y2, x1:x2])
 
 		pred_spine_lengths.append(length)
 		pred_spine_matched.append(idx in matched)
 
-def eval_detection_recall_by_period(ctx):
-	recall_map[ctx.name] = (ctx.gt_count, ctx.tp_count)
+def eval_detection_recall_by_period(pred):
+	recall_map[pred.name] = (pred.gt_count, pred.tp_count)
 
-def eval_detection_precision_by_period(ctx):
-	precision_map[ctx.name] = (ctx.tp_count, ctx.pred_count)
+def eval_detection_precision_by_period(pred):
+	precision_map[pred.name] = (pred.tp_count, pred.n)
 
 def produce_gt_coverages():
 	*_, covs, confs = zip(*gt_coverages)
@@ -409,7 +409,7 @@ def produce_detection_recall_by_period():
 		gt_count = 0
 		tp_count = 0
 
-		if period['set'] != input:
+		if period['set'] != dataset:
 			continue
 
 		for name in period['images']:
@@ -463,7 +463,7 @@ def produce_detection_precision_by_period():
 		tp_count = 0
 		pred_count = 0
 
-		if period['set'] != input:
+		if period['set'] != dataset:
 			continue
 
 		for name in period['images']:
@@ -501,39 +501,43 @@ def produce_detection_precision_by_period():
 
 makedirs(prefix)
 
-for path in glob(f"{DATASET_YOLO_DIR}/{input}/labels/*.txt"):
+for path in glob(f"{DATASET_YOLO_DIR}/{dataset}/labels/*.txt"):
 	name = path_resolve_stem(path)
 
 	label_inputs[name] = path
 
 for result in stream:
-	result = result.numpy()
-	ctx = simple_namespace()
+	res = result.numpy()
+	name = path_resolve_stem(res.path)
+	label = label_inputs[name]
+	pred = simple_namespace()
 
-	ctx.pred_bboxes = result.boxes.xyxy
-	ctx.pred_confs = result.boxes.conf
-	ctx.pred_masks = result.masks.data if result.masks else list()
-	ctx.pred_count = len(result)
-	ctx.name = path_resolve_stem(result.path)
+	if len(res):
+		pred = pred_format_result(res)
+	else:
+		pred.masks = list()
+		pred.n = 0
 
-	ctx.gt_masks, ctx.gt_bboxes = fetch_gt_shapes(label_inputs[ctx.name])
-	ctx.gt_count = len(ctx.gt_masks)
+	pred.name = name
 
-	ctx.tp_pairs = mask_find_tps(ctx.pred_masks, ctx.gt_masks)
-	ctx.tp_count = len(ctx.tp_pairs)
+	pred.gt_masks, pred.gt_bboxes = fetch_gt_shapes(label)
+	pred.gt_count = len(pred.gt_masks)
 
-	gt_count += ctx.gt_count
-	pred_count += ctx.pred_count
+	pred.tp_pairs = mask_find_tps(pred.masks, pred.gt_masks)
+	pred.tp_count = len(pred.tp_pairs)
 
-	eval_gt_coverages(ctx)
-	eval_crop_recall(ctx)
-	eval_crop_efficiencies(ctx)
-	eval_detection_recall(ctx)
-	eval_detection_precision(ctx)
-	eval_detection_recall_by_spine(ctx)
-	eval_detection_precision_by_spine(ctx)
-	eval_detection_recall_by_period(ctx)
-	eval_detection_precision_by_period(ctx)
+	gt_count += pred.gt_count
+	pred_count += pred.n
+
+	eval_gt_coverages(pred)
+	eval_crop_recall(pred)
+	eval_crop_efficiencies(pred)
+	eval_detection_recall(pred)
+	eval_detection_precision(pred)
+	eval_detection_recall_by_spine(pred)
+	eval_detection_precision_by_spine(pred)
+	eval_detection_recall_by_period(pred)
+	eval_detection_precision_by_period(pred)
 
 produce_gt_coverages()
 produce_crop_recall()
