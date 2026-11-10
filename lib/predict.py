@@ -21,14 +21,19 @@ __all__ = [
 	'pred_format_result',
 ]
 
-def pred_start_stream(name, dataset='test'):
+def pred_start_stream(name, dataset='test', __source=None):
+	source = f"{DATASET_YOLO_DIR}/{dataset}/images" if not __source else \
+		 __source
 	model = alloc_yolo(f"{CONFIG_PREDICTION_DIR}/{name}/weights/best.pt")
-	stream = model.predict(source=f"{DATASET_YOLO_DIR}/{dataset}/images",
-			       stream=True, device=0, save=False, verbose=False,
+	stream = model.predict(source,
+			       save=False,
+			       verbose=False,
+			       stream=True,
+			       device=0,
 			       retina_masks=True,
+			       agnostic_nms=True,
 			       batch=CONFIG_PRED_BATCH_SIZE,
-			       conf=CONFIG_PRED_CONF_THRESHOLD / 100,
-			       agnostic_nms=True)
+			       conf=CONFIG_PRED_CONF_THRESHOLD / 100)
 
 	return stream
 
