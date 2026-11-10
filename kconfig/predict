@@ -16,3 +16,21 @@ config PRED_CONF_THRESHOLD
 	default 30
 	help
 	  Predictions with confidence below this percentage are discarded.
+
+config PRED_ISLAND_DROP_THRESHOLD
+	int "Prediction island drop threshold"
+	default 40
+	help
+	  Islands smaller than this area in pixels are dropped.
+
+config PRED_ISLAND_MERGE_THRESHOLD
+	int "Island merge distance"
+	default 20
+	help
+	  Islands less than this distance in pixels are merged.
+
+config PRED_ISLAND_BRIDGE_RADIUS
+	int "Island bridge radius"
+	default 10
+	help
+	  Radius in pixels around the closest points used to connect islands.

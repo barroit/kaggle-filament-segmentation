@@ -5,7 +5,8 @@
 
 from math import sqrt
 
-from cv2 import fillPoly as fill_poly
+from cv2 import DIST_L2, DIST_MASK_PRECISE, \
+		distanceTransform as distance_transform, fillPoly as fill_poly
 from numpy import arange, bincount, count_nonzero, diff, flatnonzero, nonzero, \
 		  uint8, zeros
 from scipy.sparse import csr_matrix
@@ -19,6 +20,8 @@ __all__ = [
 	'mask_calc_iou',
 	'mask_calc_coverage',
 	'mask_calc_spine_length_approx',
+	'mask_calc_area',
+	'mask_calc_distance',
 	'mask_find_tps',
 ]
 
@@ -100,6 +103,16 @@ def mask_calc_spine_length_approx(mask):
 	largest = graph_select_largest(graph)
 
 	return graph_calc_span(largest)
+
+def mask_calc_area(mask):
+	return count_nonzero(mask)
+
+def mask_calc_distance(mask_a, mask_b):
+	binary = (mask_a == 0).astype('uint8')
+	dist = distance_transform(binary, DIST_L2, DIST_MASK_PRECISE)
+	dist = dist[mask_b != 0]
+
+	return dist.min()
 
 def mask_find_tps(mask_preds, mask_gts):
 	cands = list()
