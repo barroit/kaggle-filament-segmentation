@@ -137,8 +137,7 @@ def find_overlap_group(pred, idx, used):
 				coverage = mask_calc_coverage(pred.masks[a],
 							      pred.masks[b])
 
-				if coverage * 100 > \
-				   CONFIG_PRED_CONFLICT_THRESHOLD:
+				if coverage:
 					group.append(b)
 					used.add(b)
 
