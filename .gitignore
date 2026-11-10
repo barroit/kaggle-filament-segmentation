@@ -4,6 +4,7 @@
 /magfilo
 /model
 /preview
+/inspect
 
 /kconfig/gen/
 /*.tar
