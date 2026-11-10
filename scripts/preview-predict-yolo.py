@@ -17,9 +17,9 @@ from lib.mask import *
 from lib.path import *
 from lib.predict import *
 
-GT_COLOR = (255, 255, 0, 50)
-TP_COLOR = (0, 0, 255, 50)
-FP_COLOR = (255, 0, 0, 50)
+GT_COLOR = (255, 255, 0, 90)
+TP_COLOR = (0, 0, 255, 90)
+FP_COLOR = (255, 0, 0, 90)
 
 LABLE_COLOR = [
 	(0, 235, 255, 220),	# Cyan
