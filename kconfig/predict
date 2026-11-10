@@ -34,3 +34,11 @@ config PRED_ISLAND_BRIDGE_RADIUS
 	default 10
 	help
 	  Radius in pixels around the closest points used to connect islands.
+
+config PRED_CONFLICT_THRESHOLD
+	int "Prediction confliction threshold"
+	range 0 100
+	default 80
+	help
+	  Predictions are considered conflicting when one mask covers more than
+	  this percentage of another.
