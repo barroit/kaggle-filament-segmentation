@@ -13,16 +13,16 @@ from types import SimpleNamespace as simple_namespace
 
 from matplotlib.pyplot import close, subplots
 from numpy import count_nonzero, linspace, quantile, searchsorted
-from ultralytics import YOLO as yolo
 
 from lib.coord import *
 from lib.kconfig import *
 from lib.mask import *
 from lib.path import *
+from lib.predict import *
 
-input = 'test' if len(argv) != 3 else argv[2]
-prefix = f"{CONFIG_EVALUATION_DIR}/{argv[1]}" if len(argv) != 4 else \
-	 f"{CONFIG_EVALUATION_DIR}/{argv[3]}"
+dataset = 'test' if len(argv) != 3 else argv[2]
+prefix = f"{CONFIG_EVALUATION_DIR}/{argv[1]}"
+stream = pred_start_stream(argv[1], dataset)
 
 annotations_src = open(DATASET_SHARED_ANNOTATIONS)
 annotations = json_load(annotations_src)
@@ -50,12 +50,6 @@ pred_spine_matched = list()
 
 recall_map = dict()
 precision_map = dict()
-
-model = yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
-stream = model.predict(source=f"{DATASET_YOLO_DIR}/{input}/images", stream=True,
-		       save=False, verbose=False, retina_masks=True, device=0,
-		       batch=CONFIG_PRED_BATCH_SIZE,
-		       conf=CONFIG_PRED_CONF_THRESHOLD / 100)
 
 summary_plot = subplots(2, 6, figsize=(38.4, 12.8))
 summary_fig = summary_plot[0]

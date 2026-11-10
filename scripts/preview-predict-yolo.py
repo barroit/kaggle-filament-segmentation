@@ -9,8 +9,6 @@ from multiprocessing import Pool as alloc_pool, cpu_count
 from os import makedirs
 from sys import argv
 
-from ultralytics import YOLO as alloc_yolo
-
 from lib.color import *
 from lib.coord import *
 from lib.draw import *
@@ -102,18 +100,12 @@ if __name__ == '__main__':
 	pool = alloc_pool(cpus)
 	jobs = list()
 
-	split = 'test' if len(argv) < 3 else argv[2]
-	prefix = f"preview/yolo/{argv[1]}/{split}"
+	set = 'test' if len(argv) < 3 else argv[2]
+	prefix = f"preview/yolo/{argv[1]}/{set}"
 	label_map = dict()
+	stream = pred_start_stream(argv[1], set)
 
-	model = alloc_yolo(f"{CONFIG_PREDICTION_DIR}/{argv[1]}/weights/best.pt")
-	stream = model.predict(source=f"{DATASET_YOLO_DIR}/{split}/images",
-			       stream=True, save=False, verbose=False,
-			       retina_masks=True, device=0,
-			       batch=CONFIG_PRED_BATCH_SIZE,
-			       conf=CONFIG_PRED_CONF_THRESHOLD / 100)
-
-	for path in glob(f"{DATASET_YOLO_DIR}/{split}/labels/*.txt"):
+	for path in glob(f"{DATASET_YOLO_DIR}/{set}/labels/*.txt"):
 		name = path_resolve_stem(path)
 
 		label_map[name] = path
